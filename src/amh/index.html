@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <!-- Designed and Developed By MIKEINTOSH SYSTEMS -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="en">
 
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>MIKEINTOSH SYSTEMS Amharic (አማርኛ) speech to text, Amharic voice to text</title><meta name="description" content="It is a Amharic (አማርኛ) voice typing tool. Click on the Mic icon and start speaking in Amharic (አማርኛ), it will be converted to text. You can write Amharic (አማርኛ) by speaking in Amharic here."><meta name="keywords" content="amharic voice to text, amharic speech to text, amharic voice typing, amharic speech to text software, voice to text  (አማርኛ)">
-<script type="text/javascript" async="" src="./assets/analytics.js.download"></script><script type="application/ld+json">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>MIKEINTOSH SYSTEMS Amharic (አማርኛ) speech to text, Amharic voice to text</title>
+	<meta name="description"
+		content="It is a Amharic (አማርኛ) voice typing tool. Click on the Mic icon and start speaking in Amharic (አማርኛ), it will be converted to text. You can write Amharic (አማርኛ) by speaking in Amharic here.">
+	<meta name="keywords"
+		content="amharic voice to text, amharic speech to text, amharic voice typing, amharic speech to text software, voice to text  (አማርኛ)">
+	<script type="text/javascript" async="" src="./assets/analytics.js.download"></script>
+	<script type="application/ld+json">
 {
 	"@context": "https://schema.org",
 	"@type": "BreadcrumbList",
@@ -23,97 +32,274 @@
 </script>
 
 	<style>
-		#div_start{text-align:center;padding:8px 0 12px 0;}
-		#start_button{border:0;background-color:transparent;cursor:pointer;position:relative}
-		.interim{color:gray;}
-		.final{color:black;padding-right:3px}
-
-		#loadingIndicator{position:absolute !important;top:50%;left:50%;z-index:99!important;width:70px;height:70px;margin-top:-35px;margin-left:-35px;background-color:#fff;border-radius:100%;-webkit-animation:loading-spinner 1s infinite ease-in-out;animation:loading-spinner 1s infinite ease-in-out;transition:.3s linear;-webkit-transition:.3s linear;-moz-transition:.3s linear;display:inline-block;}
-		@-webkit-keyframes loading-spinner{
-			0%{-webkit-transform:scale(0)}
-			100%{-webkit-transform:scale(1);opacity:0}
-		}
-		@keyframes loading-spinner{
-			0%{-webkit-transform:scale(0);transform:scale(0)}
-			100%{-webkit-transform:scale(1);transform:scale(1);opacity:0}
+		#div_start {
+			text-align: center;
+			padding: 8px 0 12px 0;
 		}
 
-		#info p{font-size:16px;text-align:center;margin:0;}
-		#info p mark{padding:3px 5px;}
-		#info p.clr-green{color:#090;}
-		#info p.clr-red{color:#f00;}
+		#start_button {
+			border: 0;
+			background-color: transparent;
+			cursor: pointer;
+			position: relative
+		}
 
-		#results .interim{padding-left:10px;font-size:16px;}
+		.interim {
+			color: gray;
+		}
 
-		#textareaWrapper{background-color:#0e8fc1;padding:0 12px 12px 12px;}
-		#final_span{width:100%;font-size:18px;line-height:28px;height:222px;padding:10px 12px;background-color:#fff;-moz-border-radius:4px;-webkit-border-radius:4px;-khtml-border-radius:4px;border-radius:4px;}
+		.final {
+			color: black;
+			padding-right: 3px
+		}
 
-		.textareaBtn{padding:8px 0;}
-		.textareaBtn .menuBtn{float:left;font-family:'Open Sans', sans-serif;font-size:12px;font-weight:600;line-height:36px;padding:0px 8px;margin:2px;color:#fff;cursor:pointer;background:#3d556d;}
-		.textareaBtn .menuBtn.reset-icon{background-color:var(--clr-primary);}
-		.textareaBtn .menuBtn:hover{color:#fff;background:#18bd9b;}
-		.textareaBtn .menuBtn{font-family:var(--font-symbols-outlined);margin-right:3px;line-height:36px;font-size:22px;font-weight:200;float:left;}
-		.textareaBtn .menuBtn.copy-icon{content:"\e14d";}
-		.textareaBtn .menuBtn.printer-icon{content:"\e8ad";}
-		.textareaBtn .menuBtn.download-icon{font-family:var(--font-symbols-outlined);content:"\e2c4";}
-		.textareaBtn .menuBtn.reset-icon{content:"\f053";}
+		#loadingIndicator {
+			position: absolute !important;
+			top: 50%;
+			left: 50%;
+			z-index: 99 !important;
+			width: 70px;
+			height: 70px;
+			margin-top: -35px;
+			margin-left: -35px;
+			background-color: #fff;
+			border-radius: 100%;
+			-webkit-animation: loading-spinner 1s infinite ease-in-out;
+			animation: loading-spinner 1s infinite ease-in-out;
+			transition: .3s linear;
+			-webkit-transition: .3s linear;
+			-moz-transition: .3s linear;
+			display: inline-block;
+		}
 
-		.share-icon{float:left}
-		.share-icon ul{list-style-type:none}
-		.share-icon ul li{float:left;padding:2px;}
-		.share-icon ul li a{display:flex;justify-content:center;align-items:center;width:36px;height:36px;fill:#fff;}
-		.share-icon ul li.wa a{background-color:#2ab540;}
-		.share-icon ul li.wa a:hover{background-color:#fff;}
-		.share-icon ul li.wa a:hover svg{fill:#2ab540;}
-		.share-icon ul li.tw a{background-color:#00aced;}
-		.share-icon ul li.tw a:hover{background-color:#fff;}
-		.share-icon ul li.tw a:hover svg{fill:#00aced;}
+		@-webkit-keyframes loading-spinner {
+			0% {
+				-webkit-transform: scale(0)
+			}
 
-		.words-count-wrapper{padding-top:2px;}
-		.words-count-wrapper .words-count-cntnr{float:right;color:#d5d5d5;font-size:13px;line-height:20px;padding-left:12px;}
-		#wordCount, #charCountNoSpace, #totalChars{color:#fff;font-weight:600;}
+			100% {
+				-webkit-transform: scale(1);
+				opacity: 0
+			}
+		}
+
+		@keyframes loading-spinner {
+			0% {
+				-webkit-transform: scale(0);
+				transform: scale(0)
+			}
+
+			100% {
+				-webkit-transform: scale(1);
+				transform: scale(1);
+				opacity: 0
+			}
+		}
+
+		#info p {
+			font-size: 16px;
+			text-align: center;
+			margin: 0;
+		}
+
+		#info p mark {
+			padding: 3px 5px;
+		}
+
+		#info p.clr-green {
+			color: #090;
+		}
+
+		#info p.clr-red {
+			color: #f00;
+		}
+
+		#results .interim {
+			padding-left: 10px;
+			font-size: 16px;
+		}
+
+		#textareaWrapper {
+			background-color: #0e8fc1;
+			padding: 0 12px 12px 12px;
+		}
+
+		#final_span {
+			width: 100%;
+			font-size: 18px;
+			line-height: 28px;
+			height: 222px;
+			padding: 10px 12px;
+			background-color: #fff;
+			-moz-border-radius: 4px;
+			-webkit-border-radius: 4px;
+			-khtml-border-radius: 4px;
+			border-radius: 4px;
+		}
+
+		.textareaBtn {
+			padding: 8px 0;
+		}
+
+		.textareaBtn .menuBtn {
+			float: left;
+			font-family: 'Open Sans', sans-serif;
+			font-size: 12px;
+			font-weight: 600;
+			line-height: 36px;
+			padding: 0px 8px;
+			margin: 2px;
+			color: #fff;
+			cursor: pointer;
+			background: #3d556d;
+		}
+
+		.textareaBtn .menuBtn.reset-icon {
+			background-color: var(--clr-primary);
+		}
+
+		.textareaBtn .menuBtn:hover {
+			color: #fff;
+			background: #18bd9b;
+		}
+
+		.textareaBtn .menuBtn {
+			font-family: var(--font-symbols-outlined);
+			margin-right: 3px;
+			line-height: 36px;
+			font-size: 22px;
+			font-weight: 200;
+			float: left;
+		}
+
+		.textareaBtn .menuBtn.copy-icon {
+			content: "\e14d";
+		}
+
+		.textareaBtn .menuBtn.printer-icon {
+			content: "\e8ad";
+		}
+
+		.textareaBtn .menuBtn.download-icon {
+			font-family: var(--font-symbols-outlined);
+			content: "\e2c4";
+		}
+
+		.textareaBtn .menuBtn.reset-icon {
+			content: "\f053";
+		}
+
+		.share-icon {
+			float: left
+		}
+
+		.share-icon ul {
+			list-style-type: none
+		}
+
+		.share-icon ul li {
+			float: left;
+			padding: 2px;
+		}
+
+		.share-icon ul li a {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 36px;
+			height: 36px;
+			fill: #fff;
+		}
+
+		.share-icon ul li.wa a {
+			background-color: #2ab540;
+		}
+
+		.share-icon ul li.wa a:hover {
+			background-color: #fff;
+		}
+
+		.share-icon ul li.wa a:hover svg {
+			fill: #2ab540;
+		}
+
+		.share-icon ul li.tw a {
+			background-color: #00aced;
+		}
+
+		.share-icon ul li.tw a:hover {
+			background-color: #fff;
+		}
+
+		.share-icon ul li.tw a:hover svg {
+			fill: #00aced;
+		}
+
+		.words-count-wrapper {
+			padding-top: 2px;
+		}
+
+		.words-count-wrapper .words-count-cntnr {
+			float: right;
+			color: #d5d5d5;
+			font-size: 13px;
+			line-height: 20px;
+			padding-left: 12px;
+		}
+
+		#wordCount,
+		#charCountNoSpace,
+		#totalChars {
+			color: #fff;
+			font-weight: 600;
+		}
 	</style>
 
-<link rel="canonical" href="https://www.typingguru.net/voice-to-text/amharic-voice-typing">
+	<link rel="canonical" href="https://www.typingguru.net/voice-to-text/amharic-voice-typing">
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="Amharic (አማርኛ) speech to text, Amharic voice to text">
-<meta property="og:description" content="It is a Amharic (አማርኛ) voice typing tool. Click on the Mic icon and start speaking in Amharic (አማርኛ), it will be converted to text. You can write Amharic (አማርኛ) by speaking in Amharic here.">
-<meta property="og:url" content="https://www.typingguru.net/voice-to-text/amharic-voice-typing">
-<meta property="og:site_name" content="TypingGuru">
-<meta property="og:image" content="https://www.typingguru.net/images/social-thumbnail.png">
-<meta property="og:image:width" content="640">
-<meta property="og:image:height" content="640">
-<meta property="article:tag" content="amharic voice to text"><meta property="article:tag" content="amharic speech to text"><meta property="article:tag" content="amharic voice typing"><meta property="article:tag" content="amharic speech to text software"><meta property="article:tag" content="voice to text  (አማርኛ)">	
-<link type="text/css" href="./assets/style.css" rel="stylesheet">
-<link rel="preconnect" href="https://fonts.googleapis.com/">
-<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-<link rel="stylesheet" href="./assets/css2">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Amharic (አማርኛ) speech to text, Amharic voice to text">
+	<meta property="og:description"
+		content="It is a Amharic (አማርኛ) voice typing tool. Click on the Mic icon and start speaking in Amharic (አማርኛ), it will be converted to text. You can write Amharic (አማርኛ) by speaking in Amharic here.">
+	<meta property="og:url" content="https://www.typingguru.net/voice-to-text/amharic-voice-typing">
+	<meta property="og:site_name" content="TypingGuru">
+	<meta property="og:image" content="https://www.typingguru.net/images/social-thumbnail.png">
+	<meta property="og:image:width" content="640">
+	<meta property="og:image:height" content="640">
+	<meta property="article:tag" content="amharic voice to text">
+	<meta property="article:tag" content="amharic speech to text">
+	<meta property="article:tag" content="amharic voice typing">
+	<meta property="article:tag" content="amharic speech to text software">
+	<meta property="article:tag" content="voice to text  (አማርኛ)">
+	<link type="text/css" href="./assets/style.css" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com/">
+	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+	<link rel="stylesheet" href="./assets/css2">
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async="" src="./assets/js"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async="" src="./assets/js"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
 
   //gtag('config', 'UA-157255186-2');
-</script>
+	</script>
 
-<!-- Google tag (gtag.js) -->
-<script async="" src="./assets/js(1)"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+	<!-- Google tag (gtag.js) -->
+	<script async="" src="./assets/js(1)"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
 
   //gtag('config', 'G-WR4GN3GR7R');
-</script>
+	</script>
 
-<script async="" src="./assets/f.txt" crossorigin="anonymous"></script>
+	<script async="" src="./assets/f.txt" crossorigin="anonymous"></script>
 
-<link rel="icon" type="image/x-icon" href="./assets/mikeintosh.png">
-<!--
+	<link rel="icon" type="image/x-icon" href="./assets/mikeintosh.png">
+	<!--
 
 <link rel="icon" type="image/x-icon" href="https://www.typingguru.net/images/favicon/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="https://www.typingguru.net/images/favicon/favicon32x32.png">
@@ -125,92 +311,109 @@
 -->
 
 
-<meta name="theme-color" content="#0c1215">
-<style data-styled="active" data-styled-version="5.3.6"></style></head>
+	<meta name="theme-color" content="#0c1215">
+	<style data-styled="active" data-styled-version="5.3.6"></style>
+</head>
+
 <body>
-<header id="header"><br>
-	<img src="./assets/mikeintosh.png">  <font color="white"><h1>MIKEINTOSH Real Time Voice To Text Transcriber</h1></font>
-</header>
-<div class="st-container">
-<div class="st-responsive st-row">
+	<header id="header">
+		<a href="#">
+		<img src="./assets/mikeintosh.png" hight=50px; width=50px;>
+		<font color="#00ddff">
+			<h1>MIKEINTOSH Real Time Voice To Text Transcriber</h1>
+		</font>
+		</a>
+	</header>
+	<div class="st-container">
+		<div class="st-responsive st-row">
 
-<main id="main">
-		<article class="st-pdg">
+			<main id="main">
+				<article class="st-pdg">
 
-		<header class="page-heading">
-			<h1>Amharic (አማርኛ) Voice To Text Transcription</h1>
-		</header>
+					<header class="page-heading">
+						<h1>Amharic (አማርኛ) Voice To Text Transcription</h1>
+					</header>
 
-		<section>
-			<div class="st-row st-middle st-center">
+					<section>
+						<div class="st-row st-middle st-center">
 
-	<div id="info" style="visibility: visible;">
-		<p id="info_start" style="display: inline;">
-			<mark><b><i>Note:</i></b> Click on the <u>Mic</u> icon and Start Speak.</mark>
-		</p>
-		<p id="info_speak_now" class="clr-green" style="display:none">
-			Speak now.
-		</p>
-		<p id="info_no_speech" class="clr-red" style="display:none">
-			No speech was detected. You may need to adjust your microphone settings.
-		</p>
-		<p id="info_no_microphone" class="clr-red" style="display:none">
-			No microphone was found. Ensure that a microphone is installed and that microphone settings are configured correctly.
-		</p>
-		<p id="info_allow" class="clr-red" style="display:none">
-			Click the "Allow" button above to enable your microphone.
-		</p>
-		<p id="info_denied" class="clr-red" style="display:none">
-			Permission to use microphone was denied.
-		</p>
-		<p id="info_blocked" class="clr-red" style="display:none">
-			Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream
-		</p>
-		<p id="info_upgrade" class="clr-red" style="display:none">
-			Speech Recognition is not supported by this browser. Upgrade to <a href="https://www.google.com/chrome" target="_blank">Chrome</a> version 25 or later.
-		</p>
-	</div>
-	
-	<div id="results" oncanplaythrough="playf();">
-		<span class="interim" id="interim_span"></span>
-	</div>
-	
-</div>
+							<div id="info" style="visibility: visible;">
+								<p id="info_start" style="display: inline;">
+									<mark><b><i>Note:</i></b> Click on the <u>Mic</u> icon and Start Speak.</mark>
+								</p>
+								<p id="info_speak_now" class="clr-green" style="display:none">
+									Speak now.
+								</p>
+								<p id="info_no_speech" class="clr-red" style="display:none">
+									No speech was detected. You may need to adjust your microphone settings.
+								</p>
+								<p id="info_no_microphone" class="clr-red" style="display:none">
+									No microphone was found. Ensure that a microphone is installed and that microphone
+									settings are configured correctly.
+								</p>
+								<p id="info_allow" class="clr-red" style="display:none">
+									Click the "Allow" button above to enable your microphone.
+								</p>
+								<p id="info_denied" class="clr-red" style="display:none">
+									Permission to use microphone was denied.
+								</p>
+								<p id="info_blocked" class="clr-red" style="display:none">
+									Permission to use microphone is blocked. To change, go to
+									chrome://settings/contentExceptions#media-stream
+								</p>
+								<p id="info_upgrade" class="clr-red" style="display:none">
+									Speech Recognition is not supported by this browser. Upgrade to <a
+										href="https://www.google.com/chrome" target="_blank">Chrome</a> version 25 or
+									later.
+								</p>
+							</div>
 
-<div id="div_start">
-	<button id="start_button" onclick="startButton(event)" style="display: inline-block;">
-		<img src="./assets/mic.png" alt="Mic" height="50" style="width:auto;" id="start_img">
-		<div id="loadingIndicator" style="display:none;"></div>
-	</button>
-</div>
+							<div id="results" oncanplaythrough="playf();">
+								<span class="interim" id="interim_span"></span>
+							</div>
 
-<div class="ad-unit-fix-320x55">
-	<ins class="adsbygoogle" style="display:inline-block;width:320px;height:50px" data-ad-client="ca-pub-1765769888693648" data-ad-slot="9286333088"></ins>
-	<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-</div>
+						</div>
 
-<div id="textareaWrapper">
+						<div id="div_start">
+							<button id="start_button" onclick="startButton(event)" style="display: inline-block;">
+								<img src="./assets/mic.png" alt="Mic" height="50" style="width:auto;" id="start_img">
+								<div id="loadingIndicator" style="display:none;"></div>
+							</button>
+						</div>
 
-	<div class="textareaBtn clearfix">
-		<button id="copy_button" onclick="copyButton();" class="menuBtn copy-icon">Copy</button>
-		<button id="print_button" type="button" onclick="printTextArea()" class="menuBtn printer-icon">Print</button>
-		<!--button class="menuBtn" type="submit" id="email_button" onclick="EmailText()" name="email" value="Email">Email</button-->
-		<button onclick="saveTextAsFile()" class="menuBtn download-icon">Save Text to File</button>
-		<button onclick="saveDocAsFile()" class="menuBtn download-icon">Save as Doc File</button>
-		<button id="reset_button" type="button" onclick="myFunction6()" class="menuBtn reset-icon">Reset</button>
-		<!--form onsubmit="myFunction()" id="my-form" method="POST" action="https://www.typingguru.net" target="_new">
+						<div class="ad-unit-fix-320x55">
+							<ins class="adsbygoogle" style="display:inline-block;width:320px;height:50px"
+								data-ad-client="ca-pub-1765769888693648" data-ad-slot="9286333088"></ins>
+							<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+						</div>
+
+						<div id="textareaWrapper">
+
+							<div class="textareaBtn clearfix">
+								<button id="copy_button" onclick="copyButton();" class="menuBtn copy-icon">Copy</button>
+								<button id="print_button" type="button" onclick="printTextArea()"
+									class="menuBtn printer-icon">Print</button>
+								<!--button class="menuBtn" type="submit" id="email_button" onclick="EmailText()" name="email" value="Email">Email</button-->
+								<button onclick="saveTextAsFile()" class="menuBtn download-icon">Save Text to
+									File</button>
+								<button onclick="saveDocAsFile()" class="menuBtn download-icon">Save as Doc
+									File</button>
+								<button id="reset_button" type="button" onclick="myFunction6()"
+									class="menuBtn reset-icon">Reset</button>
+								<!--form onsubmit="myFunction()" id="my-form" method="POST" action="https://www.typingguru.net" target="_new">
 			<input type="hidden" name="data" id="data" value="not yet defined">
 			<button class="menuBtn" type="submit" id="submit_button">Open in Editor</button>
 		</form-->
-		<div class="share-icon">
-			<ul class="clearfix">
-				<li class="wa">
-					<a href="https://github.com/MIKEINTOSHSYSTEMS" title="Visit us on GitHub" id="github_link" target="_blank" onclick="github_visit()">
-						<img src="assets\github.com.ico" width="18" height="18" viewBox="">
-					</a>
-				</li> 
-				
-				<!-- 
+								<div class="share-icon">
+									<ul class="clearfix">
+										<li class="wa">
+											<a href="https://github.com/MIKEINTOSHSYSTEMS" title="Visit us on GitHub"
+												id="github_link" target="_blank" onclick="github_visit()">
+												<img src="assets\github.com.ico" width="18" height="18" viewBox="">
+											</a>
+										</li>
+
+										<!-- 
 				<li class="wa">
 					<a href="#" title="Share on Whatsapp" id="whatsapp_link" target="_blank" onclick="whatsapp_share()">
 						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"></path></svg>
@@ -222,78 +425,101 @@
 					</a>
 				</li>	
 				  -->
-				
-			</ul>
-		</div>
-	</div>
 
-	<form name="finaltextform" id="finaltextform">
-		<!--textarea class="final" id="final_span" name="final_span" oninput="auto_grow(this)" placeholder="Click on the mic icon to activate dictation.."></textarea-->
-		<textarea class="final" id="final_span" name="final_span" oninput="auto_grow(this)"></textarea>
-	</form>
-	
-	<div class="words-count-wrapper clearfix">
-		<div class="words-count-cntnr">Characters (with spaces): <span id="totalChars">0</span></div>
-		<div class="words-count-cntnr">Characters: <span id="charCountNoSpace">0</span></div>
-		<div class="words-count-cntnr">Words: <span id="wordCount">0</span></div>
-	</div>
+									</ul>
+								</div>
+							</div>
 
-</div>
-<div>
-	<b style="color: #00aced;">Available Languages</b>
-</div>
-<div id="div_language">
-	<select id="select_language" style="padding:3px 5px;" onchange="updateCountry()"><option value="0">አማርኛ (ኢትዮጵያ)</option></select>
-	<select id="select_dialect" style="padding: 3px 5px; visibility: hidden;"><option value="am-ET"></option></select>
-</div>
-			<div class="st-pdg-t10">
-				<div class="st-advt">
-					<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1765769888693648" data-ad-slot="9601646015" data-ad-format="auto" data-full-width-responsive="true"></ins>
-					<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+							<form name="finaltextform" id="finaltextform">
+								<!--textarea class="final" id="final_span" name="final_span" oninput="auto_grow(this)" placeholder="Click on the mic icon to activate dictation.."></textarea-->
+								<textarea class="final" id="final_span" name="final_span"
+									oninput="auto_grow(this)"></textarea>
+							</form>
+
+							<div class="words-count-wrapper clearfix">
+								<div class="words-count-cntnr">Characters (with spaces): <span id="totalChars">0</span>
+								</div>
+								<div class="words-count-cntnr">Characters: <span id="charCountNoSpace">0</span></div>
+								<div class="words-count-cntnr">Words: <span id="wordCount">0</span></div>
+							</div>
+
+						</div>
+						<div>
+							<b style="color: #00aced;">Available Languages</b>
+						</div>
+						<div id="div_language">
+							<select id="select_language" style="padding:3px 5px;" onchange="updateCountry()">
+								<option value="0">አማርኛ (ኢትዮጵያ)</option>
+							</select>
+							<select id="select_dialect" style="padding: 3px 5px; visibility: hidden;">
+								<option value="am-ET"></option>
+							</select>
+						</div>
+						<div class="st-pdg-t10">
+							<div class="st-advt">
+								<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1765769888693648"
+									data-ad-slot="9601646015" data-ad-format="auto"
+									data-full-width-responsive="true"></ins>
+								<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+							</div>
+						</div>
+
+						<div>
+							<p><b style="color:#f00;">Notice</b>: This feature currently works only on Google Chrome and
+								Microsoft Edge browser. You can download and install Google Chrome from <a
+									href="https://www.google.com/intl/en_us/chrome" title="Google Chrome"
+									target="_blank"><b>Here</b></a>.</p>
+							<p><b style="color:#f00;">About This App</b>:
+								<br>
+								<strong><u>Amharic (አማርኛ) Voice To Text Transcription</u></strong> is an easy method of
+								typing. This is a very good option for those who want Transcribe Amharic Voice/Speech
+								without using any keyboard or have to upload media files. All you need is a good mic,
+								set up the mic in your computer and start speaking, the Voice to Text typing tool will
+								recognize your voice and automatically start typing Amharic <b>LIVE and ONLINE</b>.
+								After voice typing, you can copy it and use it on MS Word, social media, comments,
+								Amharic articles etc. Please share it on Facebook, Twitter and WhatsApp and help us
+								reach more users.
+							</p>
+							<b style="color: #0e8fc1;">
+								<h2>Instruction</h2>
+								<ul class="article-ul-list">
+									<li>You must have a good quality mic.</li>
+									<li>You have to speak loud and clear.</li>
+								</ul>
+							</b>
+						</div>
+					</section>
+
+				</article>
+
+				<div class="related-tags-wrap st-pdg st-pdg-t0">
+					<div class="related-tags-box st-pdg-loop">
+						<section class="related-tags">
+							<h2>Related & Coming Soon Upcoming Apps </h2>
+							<ul class="clearfix">
+								<li><a href="#"><span class="hand-symbol">👉</span> </a></li>
+								<li><a href="#"><span class="hand-symbol">👉</span> Amharic Multimedia Audio
+										Transcription With File upload</a></li>
+							</ul>
+						</section>
+					</div>
 				</div>
-			</div>
 
-			<div>
-				<p><b style="color:#f00;">Notice</b>: This feature currently works only on Google Chrome and Microsoft Edge browser. You can download and install Google Chrome from <a href="https://www.google.com/intl/en_us/chrome" title="Google Chrome" target="_blank"><b>Here</b></a>.</p>
-				<p><b style="color:#f00;">About This App</b>:
-					<br>
-				<strong><u>Amharic (አማርኛ) Voice To Text Transcription</u></strong> is an easy method of typing. This is a very good option for those who want Transcribe Amharic Voice/Speech without using any keyboard or have to upload media files. All you need is a good mic, set up the mic in your computer and start speaking, the Voice to Text typing tool will recognize your voice and automatically start typing Amharic <b>LIVE and ONLINE</b>. After voice typing, you can copy it and use it on MS Word, social media, comments, Amharic articles etc. Please share it on Facebook, Twitter and WhatsApp and help us reach more users.</p>
-				<b style="color: #0e8fc1;"><h2>Instruction</h2>
-				<ul class="article-ul-list">
-					<li>You must have a good quality mic.</li>
-					<li>You have to speak loud and clear.</li>
-				</ul>
-			</b>
-			</div>
-		</section>
+			</main>
 
-	</article>
+			<aside id="aside">
 
-	<div class="related-tags-wrap st-pdg st-pdg-t0">
-		<div class="related-tags-box st-pdg-loop">
-			<section class="related-tags">
-				<h2>Related & Coming Soon Upcoming Apps </h2>
-				<ul class="clearfix">
-					<li><a href="#"><span class="hand-symbol">👉</span> </a></li>
-					<li><a href="#"><span class="hand-symbol">👉</span> Amharic Multimedia Audio Transcription With File upload</a></li>
-				</ul>
-			</section>
-		</div>
-	</div>
+				<div class="st-pdg" style="position:-webkit-sticky;position:sticky;top:57px">
 
-</main>
+					<div>
+						<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1765769888693648"
+							data-ad-slot="9601646015" data-ad-format="auto" data-full-width-responsive="true"></ins>
+						<script>
+							(adsbygoogle = window.adsbygoogle || []).push({});
+						</script>
+					</div>
 
-<aside id="aside">
-
-<div class="st-pdg" style="position:-webkit-sticky;position:sticky;top:57px">
-
-	<div>
-		<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1765769888693648" data-ad-slot="9601646015" data-ad-format="auto" data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>	</div>
-
-</div><!--div class="loop-repeat">
+				</div><!--div class="loop-repeat">
 	<div class="custom-ad-unit-wrapper">
 		<a href="https://www.fastestjobalert.com" title="Fastest Job Alert" target="_blank">
 			<img src="https://www.fastestjobalert.com/images/fastest-job-alert-ad-banner.jpg" width="300" height="250" alt="Fastest Job Alert Ad Banner">
@@ -301,210 +527,324 @@
 	</div>
 </div-->
 
-</aside>
-</div>
-</div><footer id="footer">
-
-	<div id="mainFooter">
-		<P><b style="color: #fff;">Designed and Developed By:</b> <a href="#"><b style="color:rgb(0, 221, 255);">MIKEINTOSH SYSTEMS</b></a> aka [MICHAEL KIFLE TEFERRA] | © 2023 All right reserved</P>
-		<p>
-			<br>
-		</p>
+			</aside>
+		</div>
 	</div>
+	<footer id="footer">
 
-</footer>
-<script src="./assets/jquery.min.js.download"></script>
+		<div id="mainFooter">
+			<P><b style="color: #fff;">Designed and Developed By:</b> <a href="#"><b
+						style="color:#00ddff;">MIKEINTOSH SYSTEMS</b></a> aka [MICHAEL KIFLE TEFERRA] | © 2023
+				All right reserved</P>
+			<p>
+				<br>
+			</p>
+		</div>
+
+	</footer>
+	<script src="./assets/jquery.min.js.download"></script>
 	<script>
 		var langs = [
 			['አማርኛ (ኢትዮጵያ)', ['am-ET']]
 		];
 	</script>
 	<script src="./assets/voice-typing-custom.js.download"></script>
-	<script src="./assets/fieldtoclipboard.js.download"></script><div style="position: absolute; background: black; color: white; padding: 4px; z-index: 10000; border-radius: 3px; font-size: 12px; box-shadow: rgba(0, 0, 0, 0.4) 3px 3px 3px; opacity: 0; transition: opacity 0.3s ease 0s;">Copied!</div>
+	<script src="./assets/fieldtoclipboard.js.download"></script>
+	<div
+		style="position: absolute; background: black; color: white; padding: 4px; z-index: 10000; border-radius: 3px; font-size: 12px; box-shadow: rgba(0, 0, 0, 0.4) 3px 3px 3px; opacity: 0; transition: opacity 0.3s ease 0s;">
+		Copied!</div>
 	<script>
-		function addtext(final_transcript){
+		function addtext(final_transcript) {
 			document.finaltextform.final_span.value = document.finaltextform.final_span.value + ' ' + final_transcript;
-			document.finaltextform.final_span.value = document.finaltextform.final_span.value.replace(/\s{2,}/g,' ');
+			document.finaltextform.final_span.value = document.finaltextform.final_span.value.replace(/\s{2,}/g, ' ');
 		}
 
 		// For cache
-		window.onload = function(){
+		window.onload = function () {
 			var amharicfinalVoice = localStorage.getItem('amharicfinalVoice');
 			if (amharicfinalVoice !== null) $('#final_span').val(amharicfinalVoice);
 		}
-		window.onbeforeunload = function() {
+		window.onbeforeunload = function () {
 			localStorage.setItem("amharicfinalVoice", $('#final_span').val());
 		}
 	</script>
 
-<script>
-	$(document).ready(function () {
-		$("#mNavBtn").on("click", function () {
-			$("body").css("overflow", "hidden");
-			$("#nav").fadeIn('fast');
-		});
-		$("#hideNavBtn").on("click", function () {
-			$("body").css("overflow", "unset");
-			$("#nav").fadeOut('fast');
-		});
-	});
-
-	/* Desktop */
-	if ($(window).width() > 1024) {
-	};
-	/* Mobile */
-	if ($(window).width() < 1025) {
-		
-		jQuery(document).ready(function ($) {
-			//Set default open/close settings
-			var divs=$('.menu-cntnr').hide(); //Hide/close all containers
-
-			var h2s=$('.m-trigger').click(function () {
-				h2s.not(this).removeClass('active')
-				$(this).toggleClass('active')
-				divs.not($(this).next()).slideUp()
-				$(this).next().slideToggle()
-				return false; //Prevent the browser jump to the link anchor
+	<script>
+		$(document).ready(function () {
+			$("#mNavBtn").on("click", function () {
+				$("body").css("overflow", "hidden");
+				$("#nav").fadeIn('fast');
+			});
+			$("#hideNavBtn").on("click", function () {
+				$("body").css("overflow", "unset");
+				$("#nav").fadeOut('fast');
 			});
 		});
-		
-	}
-</script>
-	
 
-<script>
-jQuery(function ($) {
-    $("#nav ul li a").on("click", function(e){
-		var link = $(this);
+		/* Desktop */
+		if ($(window).width() > 1024) {
+		};
+		/* Mobile */
+		if ($(window).width() < 1025) {
 
-		var item = link.parent("li");
-		
-		if (item.hasClass("active")) {
-			item.removeClass("active").children("a").removeClass("active");
-		} else {
-			item.addClass("active").children("a").addClass("active");
+			jQuery(document).ready(function ($) {
+				//Set default open/close settings
+				var divs = $('.menu-cntnr').hide(); //Hide/close all containers
+
+				var h2s = $('.m-trigger').click(function () {
+					h2s.not(this).removeClass('active')
+					$(this).toggleClass('active')
+					divs.not($(this).next()).slideUp()
+					$(this).next().slideToggle()
+					return false; //Prevent the browser jump to the link anchor
+				});
+			});
+
 		}
+	</script>
 
-		if (item.children("ul").length > 0) {
-			var href = link.attr("href");
-			link.attr("href", "#");
-			setTimeout(function () { 
-				link.attr("href", href);
-			}, 300);
+
+	<script>
+		jQuery(function ($) {
+			$("#nav ul li a").on("click", function (e) {
+				var link = $(this);
+
+				var item = link.parent("li");
+
+				if (item.hasClass("active")) {
+					item.removeClass("active").children("a").removeClass("active");
+				} else {
+					item.addClass("active").children("a").addClass("active");
+				}
+
+				if (item.children("ul").length > 0) {
+					var href = link.attr("href");
+					link.attr("href", "#");
+					setTimeout(function () {
+						link.attr("href", href);
+					}, 300);
+					e.preventDefault();
+				}
+			})
+				.each(function () {
+					var link = $(this);
+					if (link.get(0).href === location.href) {
+						link.addClass("active").parents("li").addClass("active");
+						return false;
+					}
+				});
+		});
+
+		jQuery(function ($) {
+			$(".ft-menu li a").on("click", function (e) {
+				var link = $(this);
+
+				var item = link.parent("li");
+
+				if (item.hasClass("active")) {
+					item.removeClass("active").children("a").removeClass("active");
+				} else {
+					item.addClass("active").children("a").addClass("active");
+				}
+
+				if (item.children("ul").length > 0) {
+					var href = link.attr("href");
+					link.attr("href", "#");
+					setTimeout(function () {
+						link.attr("href", href);
+					}, 300);
+					e.preventDefault();
+				}
+			})
+				.each(function () {
+					var link = $(this);
+					if (link.get(0).href === location.href) {
+						link.addClass("active").parents("li").addClass("active");
+						return false;
+					}
+				});
+		});
+	</script>
+
+	<script>
+		var countdown = 6;
+		function fnDownload(e) {
 			e.preventDefault();
+			countdown = countdown - 1;
+			if (countdown == 5) {
+				e.target.innerText = 'Wait.. ' + countdown.toString() + ' Sec.';
+			}
+			if (countdown == 5) {
+				countdown = 5;
+				var myDownloadInterval = setInterval(function () {
+					countdown = countdown - 1;
+					if (countdown >= 0) {
+						//e.target.innerText = 'Download will start in ' + countdown.toString() + ' sec';
+						e.target.innerText = 'Wait.. ' + countdown.toString() + ' Sec.';
+					}
+					if (countdown <= 0) {
+						clearInterval(myDownloadInterval);
+						countdown = 6;
+						e.target.innerText = 'Downloaded';
+						e.target.setAttribute("class", "font-download-btn downloaded");
+						var a = document.createElement("a");
+						a.href = e.target.href;
+						a.setAttribute('download', '');
+						a.click();
+					}
+				}, 1000);
+			}
+			else {
+				alert('Another file is downloading! Please Wait...');
+			}
 		}
-	})
-	.each(function() {
-		var link = $(this);
-		if (link.get(0).href === location.href) {
-			link.addClass("active").parents("li").addClass("active");
-			return false;
-		}
-	});
-});
 
-jQuery(function ($) {
-    $(".ft-menu li a").on("click", function(e){
-		var link = $(this);
-
-		var item = link.parent("li");
-		
-		if (item.hasClass("active")) {
-			item.removeClass("active").children("a").removeClass("active");
-		} else {
-			item.addClass("active").children("a").addClass("active");
-		}
-
-		if (item.children("ul").length > 0) {
-			var href = link.attr("href");
-			link.attr("href", "#");
-			setTimeout(function () { 
-				link.attr("href", href);
-			}, 300);
+		var countdownfast = 3;
+		function fnDownloadFast(e) {
 			e.preventDefault();
+			countdownfast = countdownfast - 1;
+			if (countdownfast == 2) {
+				e.target.innerText = 'Wait...';
+			}
+			if (countdownfast == 2) {
+				countdownfast = 2;
+				var myDownloadInterval = setInterval(function () {
+					countdownfast = countdownfast - 1;
+					if (countdownfast >= 0) {
+						e.target.innerText = 'Wait...';
+					}
+					if (countdownfast <= 0) {
+						clearInterval(myDownloadInterval);
+						countdownfast = 3;
+						e.target.innerText = 'Downloaded';
+						e.target.setAttribute("class", "font-download-btn downloaded");
+						var a = document.createElement("a");
+						a.href = e.target.href;
+						a.setAttribute('download', '');
+						a.click();
+					}
+				}, 1000);
+			}
+			else {
+				alert('Another file is downloading! Please Wait...');
+			}
 		}
-	})
-	.each(function() {
-		var link = $(this);
-		if (link.get(0).href === location.href) {
-			link.addClass("active").parents("li").addClass("active");
-			return false;
-		}
-	});
-});
-</script>
-
-<script>
-var countdown = 6;
-function fnDownload(e){
-	e.preventDefault();
-	countdown = countdown - 1;
-	if(countdown==5){
-		e.target.innerText = 'Wait.. ' + countdown.toString() + ' Sec.';
-	}
-	if(countdown==5){
-		countdown = 5;
-		var myDownloadInterval = setInterval(function(){
-		countdown = countdown - 1;
-		if(countdown>=0)
-		{
-			//e.target.innerText = 'Download will start in ' + countdown.toString() + ' sec';
-			e.target.innerText = 'Wait.. ' + countdown.toString() + ' Sec.';
-		}
-		if(countdown <=0)
-		{
-			clearInterval(myDownloadInterval);
-			countdown = 6;
-			e.target.innerText = 'Downloaded';
-			e.target.setAttribute("class", "font-download-btn downloaded");
-			var a = document.createElement("a");
-			a.href = e.target.href;
-			a.setAttribute('download','');
-			a.click();
-		}
-		},1000);
-	}
-	else{
-		alert('Another file is downloading! Please Wait...');
-	}
-}
-
-var countdownfast = 3;
-function fnDownloadFast(e){
-	e.preventDefault();
-	countdownfast = countdownfast - 1;
-	if(countdownfast==2){
-		e.target.innerText = 'Wait...';
-	}
-	if(countdownfast==2){
-		countdownfast = 2;
-		var myDownloadInterval = setInterval(function(){
-		countdownfast = countdownfast - 1;
-		if(countdownfast>=0)
-		{
-			e.target.innerText = 'Wait...';
-		}
-		if(countdownfast <=0)
-		{
-			clearInterval(myDownloadInterval);
-			countdownfast = 3;
-			e.target.innerText = 'Downloaded';
-			e.target.setAttribute("class", "font-download-btn downloaded");
-			var a = document.createElement("a");
-			a.href = e.target.href;
-			a.setAttribute('download','');
-			a.click();
-		}
-		},1000);
-	}
-	else{
-		alert('Another file is downloading! Please Wait...');
-	}
-}
-</script>
+	</script>
 
 
 
-<div id="j_f_asin" style="color: initial; font: initial; font-feature-settings: initial; font-kerning: initial; font-optical-sizing: initial; font-palette: initial; font-synthesis: initial; font-variation-settings: initial; forced-color-adjust: initial; text-orientation: initial; text-rendering: initial; -webkit-font-smoothing: initial; -webkit-locale: initial; -webkit-text-orientation: initial; -webkit-writing-mode: initial; writing-mode: initial; zoom: initial; accent-color: initial; place-content: initial; place-items: initial; place-self: initial; alignment-baseline: initial; animation: initial; app-region: initial; appearance: initial; aspect-ratio: initial; backdrop-filter: initial; backface-visibility: initial; background: initial; background-blend-mode: initial; baseline-shift: initial; block-size: initial; border-block: initial; border: initial; border-radius: initial; border-collapse: initial; border-end-end-radius: initial; border-end-start-radius: initial; border-inline: initial; border-start-end-radius: initial; border-start-start-radius: initial; inset: initial; box-shadow: initial; box-sizing: initial; break-after: initial; break-before: initial; break-inside: initial; buffered-rendering: initial; caption-side: initial; caret-color: initial; clear: initial; clip: initial; clip-path: initial; clip-rule: initial; color-interpolation: initial; color-interpolation-filters: initial; color-rendering: initial; color-scheme: initial; columns: initial; column-fill: initial; gap: initial; column-rule: initial; column-span: initial; contain: initial; contain-intrinsic-block-size: initial; contain-intrinsic-size: initial; contain-intrinsic-inline-size: initial; container: initial; content: initial; content-visibility: initial; counter-increment: initial; counter-reset: initial; counter-set: initial; cursor: initial; cx: initial; cy: initial; d: initial; display: initial; dominant-baseline: initial; empty-cells: initial; fill: initial; fill-opacity: initial; fill-rule: initial; filter: initial; flex: initial; flex-flow: initial; float: initial; flood-color: initial; flood-opacity: initial; grid: initial; grid-area: initial; height: initial; hyphenate-character: initial; hyphens: initial; image-orientation: initial; image-rendering: initial; inline-size: initial; inset-block: initial; inset-inline: initial; isolation: initial; letter-spacing: initial; lighting-color: initial; line-break: initial; list-style: initial; margin-block: initial; margin: initial; margin-inline: initial; marker: initial; mask: initial; mask-type: initial; max-block-size: initial; max-height: initial; max-inline-size: initial; max-width: initial; min-block-size: initial; min-height: initial; min-inline-size: initial; min-width: initial; mix-blend-mode: initial; object-fit: initial; object-position: initial; object-view-box: initial; offset: initial; opacity: initial; order: initial; origin-trial-test-property: initial; orphans: initial; outline: initial; outline-offset: initial; overflow-anchor: initial; overflow-clip-margin: initial; overflow-wrap: initial; overflow: initial; overscroll-behavior-block: initial; overscroll-behavior-inline: initial; overscroll-behavior: initial; padding-block: initial; padding: initial; padding-inline: initial; page: initial; page-orientation: initial; paint-order: initial; perspective: initial; perspective-origin: initial; pointer-events: initial; position: relative; quotes: initial; r: initial; resize: initial; rotate: initial; ruby-position: initial; rx: initial; ry: initial; scale: initial; scroll-behavior: initial; scroll-margin-block: initial; scroll-margin: initial; scroll-margin-inline: initial; scroll-padding-block: initial; scroll-padding: initial; scroll-padding-inline: initial; scroll-snap-align: initial; scroll-snap-stop: initial; scroll-snap-type: initial; scrollbar-gutter: initial; shape-image-threshold: initial; shape-margin: initial; shape-outside: initial; shape-rendering: initial; size: initial; speak: initial; stop-color: initial; stop-opacity: initial; stroke: initial; stroke-dasharray: initial; stroke-dashoffset: initial; stroke-linecap: initial; stroke-linejoin: initial; stroke-miterlimit: initial; stroke-opacity: initial; stroke-width: initial; tab-size: initial; table-layout: initial; text-align: initial; text-align-last: initial; text-anchor: initial; text-combine-upright: initial; text-decoration: initial; text-decoration-skip-ink: initial; text-emphasis: initial; text-emphasis-position: initial; text-indent: initial; text-overflow: initial; text-shadow: initial; text-size-adjust: initial; text-transform: initial; text-underline-offset: initial; text-underline-position: initial; touch-action: initial; transform: initial; transform-box: initial; transform-origin: initial; transform-style: initial; transition: initial; translate: initial; user-select: initial; vector-effect: initial; vertical-align: initial; visibility: initial; border-spacing: initial; -webkit-box-align: initial; -webkit-box-decoration-break: initial; -webkit-box-direction: initial; -webkit-box-flex: initial; -webkit-box-ordinal-group: initial; -webkit-box-orient: initial; -webkit-box-pack: initial; -webkit-box-reflect: initial; -webkit-highlight: initial; -webkit-line-break: initial; -webkit-line-clamp: initial; -webkit-mask-box-image: initial; -webkit-mask: initial; -webkit-mask-composite: initial; -webkit-print-color-adjust: initial; -webkit-rtl-ordering: initial; -webkit-ruby-position: initial; -webkit-tap-highlight-color: initial; -webkit-text-combine: initial; -webkit-text-decorations-in-effect: initial; -webkit-text-fill-color: initial; -webkit-text-security: initial; -webkit-text-stroke: initial; -webkit-user-drag: initial; -webkit-user-modify: initial; white-space: initial; widows: initial; width: initial; will-change: initial; word-break: initial; word-spacing: initial; x: initial; y: initial; z-index: 2147483647;"><style type="text/css">16580@font-face{font-family:"Roboto";src:url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-100.woff) format("woff"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-100.woff2) format("woff2"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-100.ttf) format("truetype");font-style:normal;font-weight:100;font-display:swap}@font-face{font-family:"Roboto";src:url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-300.woff) format("woff"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-300.woff2) format("woff2"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-300.ttf) format("truetype");font-style:normal;font-weight:300;font-display:swap}@font-face{font-family:"Roboto";src:url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-400.woff) format("woff"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-400.woff2) format("woff2"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-400.ttf) format("truetype");font-style:normal;font-weight:400;font-display:swap}@font-face{font-family:"Roboto";src:url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-500.woff) format("woff"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-500.woff2) format("woff2"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-500.ttf) format("truetype");font-style:normal;font-weight:500;font-display:swap}@font-face{font-family:"Roboto";src:url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-700.woff) format("woff"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-700.woff2) format("woff2"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-700.ttf) format("truetype");font-style:normal;font-weight:700;font-display:swap}@font-face{font-family:"Roboto";src:url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-900.woff) format("woff"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-900.woff2) format("woff2"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-900.ttf) format("truetype");font-style:normal;font-weight:900;font-display:swap}@font-face{font-family:"Rebond";src:url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-400.woff) format("woff"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-400.woff2) format("woff2"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-400.ttf) format("truetype");font-style:normal;font-weight:400;font-display:swap}@font-face{font-family:"Rebond";src:url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-500.woff) format("woff"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-500.woff2) format("woff2"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-500.ttf) format("truetype");font-style:normal;font-weight:500;font-display:swap}@font-face{font-family:"Rebond";src:url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-600.woff) format("woff"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-600.woff2) format("woff2"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-600.ttf) format("truetype");font-style:normal;font-weight:600;font-display:swap}@font-face{font-family:"Rebond";src:url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-700.woff) format("woff"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-700.woff2) format("woff2"),url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-700.ttf) format("truetype");font-style:normal;font-weight:700;font-display:swap}</style><style type="text/css">#j_f_asin div:empty {
-          display: block !important;
-        }86660#__wikibuy__ .__wikibuy.__onTop,body~div:not(#gdx-bubble-host),#piggyWrapper,#honeyContainer,#earny-root{position:absolute !important;z-index:100000 !important}body[data-shop-url="https://www.honeybum.com"] header>.header{z-index:99999}.mm-slideout{z-index:initial}.sorry-for-this__empty-styles{position:relative;z-index:10000}</style><div style="all: initial;"></div></div></body></html>
+	<div id="j_f_asin"
+		style="color: initial; font: initial; font-feature-settings: initial; font-kerning: initial; font-optical-sizing: initial; font-palette: initial; font-synthesis: initial; font-variation-settings: initial; forced-color-adjust: initial; text-orientation: initial; text-rendering: initial; -webkit-font-smoothing: initial; -webkit-locale: initial; -webkit-text-orientation: initial; -webkit-writing-mode: initial; writing-mode: initial; zoom: initial; accent-color: initial; place-content: initial; place-items: initial; place-self: initial; alignment-baseline: initial; animation: initial; app-region: initial; appearance: initial; aspect-ratio: initial; backdrop-filter: initial; backface-visibility: initial; background: initial; background-blend-mode: initial; baseline-shift: initial; block-size: initial; border-block: initial; border: initial; border-radius: initial; border-collapse: initial; border-end-end-radius: initial; border-end-start-radius: initial; border-inline: initial; border-start-end-radius: initial; border-start-start-radius: initial; inset: initial; box-shadow: initial; box-sizing: initial; break-after: initial; break-before: initial; break-inside: initial; buffered-rendering: initial; caption-side: initial; caret-color: initial; clear: initial; clip: initial; clip-path: initial; clip-rule: initial; color-interpolation: initial; color-interpolation-filters: initial; color-rendering: initial; color-scheme: initial; columns: initial; column-fill: initial; gap: initial; column-rule: initial; column-span: initial; contain: initial; contain-intrinsic-block-size: initial; contain-intrinsic-size: initial; contain-intrinsic-inline-size: initial; container: initial; content: initial; content-visibility: initial; counter-increment: initial; counter-reset: initial; counter-set: initial; cursor: initial; cx: initial; cy: initial; d: initial; display: initial; dominant-baseline: initial; empty-cells: initial; fill: initial; fill-opacity: initial; fill-rule: initial; filter: initial; flex: initial; flex-flow: initial; float: initial; flood-color: initial; flood-opacity: initial; grid: initial; grid-area: initial; height: initial; hyphenate-character: initial; hyphens: initial; image-orientation: initial; image-rendering: initial; inline-size: initial; inset-block: initial; inset-inline: initial; isolation: initial; letter-spacing: initial; lighting-color: initial; line-break: initial; list-style: initial; margin-block: initial; margin: initial; margin-inline: initial; marker: initial; mask: initial; mask-type: initial; max-block-size: initial; max-height: initial; max-inline-size: initial; max-width: initial; min-block-size: initial; min-height: initial; min-inline-size: initial; min-width: initial; mix-blend-mode: initial; object-fit: initial; object-position: initial; object-view-box: initial; offset: initial; opacity: initial; order: initial; origin-trial-test-property: initial; orphans: initial; outline: initial; outline-offset: initial; overflow-anchor: initial; overflow-clip-margin: initial; overflow-wrap: initial; overflow: initial; overscroll-behavior-block: initial; overscroll-behavior-inline: initial; overscroll-behavior: initial; padding-block: initial; padding: initial; padding-inline: initial; page: initial; page-orientation: initial; paint-order: initial; perspective: initial; perspective-origin: initial; pointer-events: initial; position: relative; quotes: initial; r: initial; resize: initial; rotate: initial; ruby-position: initial; rx: initial; ry: initial; scale: initial; scroll-behavior: initial; scroll-margin-block: initial; scroll-margin: initial; scroll-margin-inline: initial; scroll-padding-block: initial; scroll-padding: initial; scroll-padding-inline: initial; scroll-snap-align: initial; scroll-snap-stop: initial; scroll-snap-type: initial; scrollbar-gutter: initial; shape-image-threshold: initial; shape-margin: initial; shape-outside: initial; shape-rendering: initial; size: initial; speak: initial; stop-color: initial; stop-opacity: initial; stroke: initial; stroke-dasharray: initial; stroke-dashoffset: initial; stroke-linecap: initial; stroke-linejoin: initial; stroke-miterlimit: initial; stroke-opacity: initial; stroke-width: initial; tab-size: initial; table-layout: initial; text-align: initial; text-align-last: initial; text-anchor: initial; text-combine-upright: initial; text-decoration: initial; text-decoration-skip-ink: initial; text-emphasis: initial; text-emphasis-position: initial; text-indent: initial; text-overflow: initial; text-shadow: initial; text-size-adjust: initial; text-transform: initial; text-underline-offset: initial; text-underline-position: initial; touch-action: initial; transform: initial; transform-box: initial; transform-origin: initial; transform-style: initial; transition: initial; translate: initial; user-select: initial; vector-effect: initial; vertical-align: initial; visibility: initial; border-spacing: initial; -webkit-box-align: initial; -webkit-box-decoration-break: initial; -webkit-box-direction: initial; -webkit-box-flex: initial; -webkit-box-ordinal-group: initial; -webkit-box-orient: initial; -webkit-box-pack: initial; -webkit-box-reflect: initial; -webkit-highlight: initial; -webkit-line-break: initial; -webkit-line-clamp: initial; -webkit-mask-box-image: initial; -webkit-mask: initial; -webkit-mask-composite: initial; -webkit-print-color-adjust: initial; -webkit-rtl-ordering: initial; -webkit-ruby-position: initial; -webkit-tap-highlight-color: initial; -webkit-text-combine: initial; -webkit-text-decorations-in-effect: initial; -webkit-text-fill-color: initial; -webkit-text-security: initial; -webkit-text-stroke: initial; -webkit-user-drag: initial; -webkit-user-modify: initial; white-space: initial; widows: initial; width: initial; will-change: initial; word-break: initial; word-spacing: initial; x: initial; y: initial; z-index: 2147483647;">
+		<style type="text/css">
+			16580@font-face {
+				font-family: "Roboto";
+				src: url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-100.woff) format("woff"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-100.woff2) format("woff2"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-100.ttf) format("truetype");
+				font-style: normal;
+				font-weight: 100;
+				font-display: swap
+			}
+
+			@font-face {
+				font-family: "Roboto";
+				src: url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-300.woff) format("woff"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-300.woff2) format("woff2"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-300.ttf) format("truetype");
+				font-style: normal;
+				font-weight: 300;
+				font-display: swap
+			}
+
+			@font-face {
+				font-family: "Roboto";
+				src: url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-400.woff) format("woff"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-400.woff2) format("woff2"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-400.ttf) format("truetype");
+				font-style: normal;
+				font-weight: 400;
+				font-display: swap
+			}
+
+			@font-face {
+				font-family: "Roboto";
+				src: url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-500.woff) format("woff"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-500.woff2) format("woff2"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-500.ttf) format("truetype");
+				font-style: normal;
+				font-weight: 500;
+				font-display: swap
+			}
+
+			@font-face {
+				font-family: "Roboto";
+				src: url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-700.woff) format("woff"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-700.woff2) format("woff2"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-700.ttf) format("truetype");
+				font-style: normal;
+				font-weight: 700;
+				font-display: swap
+			}
+
+			@font-face {
+				font-family: "Roboto";
+				src: url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-900.woff) format("woff"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-900.woff2) format("woff2"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Roboto/roboto-900.ttf) format("truetype");
+				font-style: normal;
+				font-weight: 900;
+				font-display: swap
+			}
+
+			@font-face {
+				font-family: "Rebond";
+				src: url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-400.woff) format("woff"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-400.woff2) format("woff2"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-400.ttf) format("truetype");
+				font-style: normal;
+				font-weight: 400;
+				font-display: swap
+			}
+
+			@font-face {
+				font-family: "Rebond";
+				src: url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-500.woff) format("woff"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-500.woff2) format("woff2"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-500.ttf) format("truetype");
+				font-style: normal;
+				font-weight: 500;
+				font-display: swap
+			}
+
+			@font-face {
+				font-family: "Rebond";
+				src: url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-600.woff) format("woff"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-600.woff2) format("woff2"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-600.ttf) format("truetype");
+				font-style: normal;
+				font-weight: 600;
+				font-display: swap
+			}
+
+			@font-face {
+				font-family: "Rebond";
+				src: url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-700.woff) format("woff"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-700.woff2) format("woff2"), url(chrome-extension://jkagfomdekeocgkicjolfkpciipclpkb/fonts/Rebond/rebond-700.ttf) format("truetype");
+				font-style: normal;
+				font-weight: 700;
+				font-display: swap
+			}
+		</style>
+		<style type="text/css">
+			#j_f_asin div:empty {
+				display: block !important;
+			}
+
+			86660#__wikibuy__ .__wikibuy.__onTop,
+			body~div:not(#gdx-bubble-host),
+			#piggyWrapper,
+			#honeyContainer,
+			#earny-root {
+				position: absolute !important;
+				z-index: 100000 !important
+			}
+
+			body[data-shop-url="https://www.honeybum.com"] header>.header {
+				z-index: 99999
+			}
+
+			.mm-slideout {
+				z-index: initial
+			}
+
+			.sorry-for-this__empty-styles {
+				position: relative;
+				z-index: 10000
+			}
+		</style>
+		<div style="all: initial;"></div>
+	</div>
+</body>
+
+</html>

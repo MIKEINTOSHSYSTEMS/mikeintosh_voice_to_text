@@ -267,7 +267,7 @@ function saveTextAsFile(){
     var textToSave = document.getElementById("final_span").value;
     var textToSaveAsBlob = new Blob([textToSave], {type:"text/plain"});
     var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
-	var fileNameToSaveAs = "merq_amharicvoicetotext.txt";
+	var fileNameToSaveAs = "mikeintosh_amharicvoicetotext.txt";
  
     var downloadLink = document.createElement("a");
     downloadLink.download = fileNameToSaveAs;
@@ -285,7 +285,7 @@ function saveDocAsFile(){
     var textToSave = document.getElementById("final_span").value;
     var textToSaveAsBlob = new Blob([textToSave], {type:"text/Doc"});
     var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
-    var fileNameToSaveAs = "merq_amharicvoicetotext.doc";
+    var fileNameToSaveAs = "mikeintosh_amharicvoicetotext.doc";
 	 
     var downloadLink = document.createElement("a");
     downloadLink.download = fileNameToSaveAs;
