@@ -23,7 +23,7 @@ h1{font-size:28px;line-height:36px}
 h2{font-size:21px;line-height:28px}
 h3{font-size:16px;line-height:24px}
 h1, h2, h3{font-weight:400}
-p{font-size:16px;line-height:1.5;color:#555;margin:16px 0}
+p{font-size:16px;line-height:1.5;color:rgb(255, 255, 255);margin:16px 0}
 .single-line-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .clearfix:after{visibility:hidden;display:block;font-size:0;line-height:0;content:"";clear:both;height:0}
