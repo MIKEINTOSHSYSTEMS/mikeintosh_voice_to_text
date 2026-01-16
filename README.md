@@ -24,5 +24,5 @@ Preview
 ![image](https://user-images.githubusercontent.com/37907891/211163422-1b25f8cf-8bd5-460a-810c-43da3492ba5a.png)
 
 Link to a real working demo:
-https://mikeintoshsys.com/audio-transcriber
+https://mikeintoshs.com/audio-transcriber
 
