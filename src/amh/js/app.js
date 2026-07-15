@@ -490,9 +490,7 @@
   // INITIALIZATION
   // ============================================
 
-  function init() {
-    ThemeManager.init();
-
+  function initApp() {
     SearchManager.init({
       textarea: elements.outputTextarea,
       searchInput: elements.searchInput,
@@ -607,6 +605,21 @@
     setStatus('status-ready');
 
     window.addEventListener('beforeunload', cleanup);
+  }
+
+  async function init() {
+    ThemeManager.init();
+
+    try {
+      await StorageManager.initDB();
+      if (StorageManager.needsMigration()) {
+        await StorageManager.migrate();
+      }
+    } catch (error) {
+      console.warn('IndexedDB initialization failed, continuing with localStorage:', error);
+    }
+
+    initApp();
   }
 
   // Start the app when DOM is ready
