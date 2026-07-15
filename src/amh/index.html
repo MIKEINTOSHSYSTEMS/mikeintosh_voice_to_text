@@ -30,8 +30,8 @@
       </button>
     </header>
 
-    <main class="app-main" role="main">
-      <section class="transcription-section" aria-label="Transcription Controls">
+    <main class="app-main">
+      <section class="glass-card transcription-section" aria-label="Transcription Controls">
         <div class="mic-container">
           <div class="mic-wrapper">
             <button 
@@ -59,6 +59,7 @@
             </div>
           </div>
           <p class="mic-status" id="mic-status" aria-live="polite">Press to start recording</p>
+          <p class="recording-timer" id="recording-timer" hidden aria-live="off">00:00</p>
         </div>
 
         <div class="controls">
@@ -89,7 +90,7 @@
         </div>
       </section>
 
-      <section class="transcription-output" aria-label="Transcription Results">
+      <section class="glass-card transcription-output" aria-label="Transcription Results">
         <div class="output-header">
           <h2 class="output-title">Transcription</h2>
           <div class="word-count" id="word-count" aria-live="polite">
@@ -119,7 +120,7 @@
         </div>
       </section>
 
-      <section class="status-section" aria-label="Status Information">
+      <section class="glass-card status-section" aria-label="Status Information">
         <div class="status-messages" id="status-messages" aria-live="polite">
           <p class="status-message" id="status-ready">Ready to transcribe. Click the microphone to begin.</p>
           <p class="status-message" id="status-listening" hidden>Listening... Speak now.</p>

@@ -12,6 +12,7 @@
 
   const STORAGE_KEY = 'amharic_transcription';
   const THEME_KEY = 'theme';
+  const RECORDING_TIMER_INTERVAL = 1000;
 
   // ============================================
   // STATE MANAGEMENT
@@ -24,6 +25,8 @@
     interimTranscript: '',
     recognition: null,
     startTimestamp: 0,
+    recordingDuration: 0,
+    recordingTimer: null,
     ignoreOnEnd: false,
     theme: localStorage.getItem(THEME_KEY) || 'dark',
   };
@@ -37,6 +40,7 @@
     micButton: document.getElementById('mic-button'),
     micAnimated: document.getElementById('mic-animated'),
     micStatus: document.getElementById('mic-status'),
+    recordingTimer: document.getElementById('recording-timer'),
     outputTextarea: document.getElementById('transcription-output'),
     copyButton: document.getElementById('copy-button'),
     printButton: document.getElementById('print-button'),
@@ -102,6 +106,18 @@
   // UTILITY FUNCTIONS
   // ============================================
 
+  function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
+  function formatDuration(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
   function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -158,6 +174,32 @@
       : 'Press to start recording';
   }
 
+  function startRecordingTimer() {
+    state.recordingDuration = 0;
+    updateTimerDisplay();
+    elements.recordingTimer.hidden = false;
+    state.recordingTimer = setInterval(() => {
+      state.recordingDuration++;
+      updateTimerDisplay();
+    }, RECORDING_TIMER_INTERVAL);
+  }
+
+  function stopRecordingTimer() {
+    if (state.recordingTimer) {
+      clearInterval(state.recordingTimer);
+      state.recordingTimer = null;
+    }
+    elements.recordingTimer.hidden = true;
+    state.recordingDuration = 0;
+    updateTimerDisplay();
+  }
+
+  function updateTimerDisplay() {
+    if (elements.recordingTimer) {
+      elements.recordingTimer.textContent = formatDuration(state.recordingDuration);
+    }
+  }
+
   // ============================================
   // SPEECH RECOGNITION
   // ============================================
@@ -187,6 +229,7 @@
 
   function handleRecognitionStart() {
     setRecordingState(true);
+    startRecordingTimer();
     setStatus('status-listening');
     elements.micStatus.textContent = 'Listening... Speak now.';
   }
@@ -198,12 +241,11 @@
       const transcript = event.results[i][0].transcript;
 
       if (event.results[i].isFinal) {
-        // Append new text on TOP (prepend) of existing text
         const existingText = elements.outputTextarea.value;
         const newText = transcript.trim();
         
         if (existingText.trim()) {
-          elements.outputTextarea.value = newText + '\n' + existingText;
+          elements.outputTextarea.value = existingText + '\n' + newText;
         } else {
           elements.outputTextarea.value = newText;
         }
@@ -252,6 +294,7 @@
 
   function handleRecognitionEnd() {
     setRecordingState(false);
+    stopRecordingTimer();
 
     if (state.ignoreOnEnd) {
       state.ignoreOnEnd = false;
@@ -273,7 +316,6 @@
       state.recognition.stop();
     } else {
       state.finalTranscript = '';
-      // Do NOT clear the textarea - keep existing text
       
       try {
         state.recognition.start();
@@ -339,6 +381,7 @@
     const text = elements.outputTextarea.value;
     if (!text) return;
 
+    const safeText = escapeHTML(text);
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -353,7 +396,7 @@
       </head>
       <body>
         <h1>Amharic Voice-to-Text Transcription</h1>
-        <div class="content">${text}</div>
+        <div class="content">${safeText}</div>
       </body>
       </html>
     `);
@@ -392,6 +435,7 @@
     if (state.isRecording) {
       state.recognition.stop();
     }
+    stopRecordingTimer();
 
     state.finalTranscript = '';
     state.interimTranscript = '';
@@ -413,6 +457,7 @@
     if (state.isRecording) {
       state.recognition.stop();
     }
+    stopRecordingTimer();
 
     state.finalTranscript = '';
     state.interimTranscript = '';
