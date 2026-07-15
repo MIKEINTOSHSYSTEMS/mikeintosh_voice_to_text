@@ -29,6 +29,8 @@
     recordingTimer: null,
     ignoreOnEnd: false,
     theme: localStorage.getItem(THEME_KEY) || 'dark',
+    microphonePermission: 'unknown',
+    recognitionStatus: 'idle',
   };
 
   // ============================================
@@ -54,6 +56,12 @@
     wordCountValue: document.getElementById('word-count-value'),
     statusMessages: document.getElementById('status-messages'),
     toastContainer: document.getElementById('toast-container'),
+    micIndicator: document.getElementById('mic-indicator'),
+    recognitionStatus: document.getElementById('recognition-status'),
+    statDuration: document.getElementById('stat-duration'),
+    statAudioLevel: document.getElementById('stat-audio-level'),
+    audioVisualizer: document.getElementById('audio-visualizer'),
+    audioVisualizerContainer: document.getElementById('audio-visualizer-container'),
   };
 
   // ============================================
@@ -113,9 +121,10 @@
   }
 
   function formatDuration(seconds) {
-    const mins = Math.floor(seconds / 60);
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 
   function showToast(message) {
@@ -198,6 +207,83 @@
     if (elements.recordingTimer) {
       elements.recordingTimer.textContent = formatDuration(state.recordingDuration);
     }
+    if (elements.statDuration) {
+      elements.statDuration.textContent = formatDuration(state.recordingDuration);
+    }
+  }
+
+  // ============================================
+  // DASHBOARD MANAGEMENT
+  // ============================================
+
+  function updateMicIndicator(permissionState) {
+    state.microphonePermission = permissionState;
+    if (elements.micIndicator) {
+      elements.micIndicator.setAttribute('data-state', permissionState);
+      const labels = {
+        unknown: 'Microphone status: unknown',
+        granted: 'Microphone available',
+        denied: 'Microphone permission denied',
+        prompt: 'Microphone permission requested',
+        recording: 'Microphone active',
+      };
+      elements.micIndicator.setAttribute('aria-label', labels[permissionState] || 'Microphone status unknown');
+    }
+  }
+
+  function updateRecognitionStatus(status) {
+    state.recognitionStatus = status;
+    if (elements.recognitionStatus) {
+      const labels = {
+        idle: 'Idle',
+        listening: 'Listening',
+        processing: 'Processing',
+        error: 'Error',
+      };
+      elements.recognitionStatus.textContent = labels[status] || status;
+    }
+  }
+
+  function updateAudioLevel(level) {
+    if (elements.statAudioLevel) {
+      if (level > 0.01) {
+        const percentage = Math.round(level * 100);
+        elements.statAudioLevel.textContent = `${percentage}%`;
+      } else {
+        elements.statAudioLevel.textContent = '--';
+      }
+    }
+  }
+
+  function showAudioVisualizer() {
+    if (elements.audioVisualizerContainer) {
+      elements.audioVisualizerContainer.hidden = false;
+    }
+  }
+
+  function hideAudioVisualizer() {
+    if (elements.audioVisualizerContainer) {
+      elements.audioVisualizerContainer.hidden = true;
+    }
+  }
+
+  function setupAudioVisualizer() {
+    if (!elements.audioVisualizer || typeof AudioManager === 'undefined') return;
+
+    const canvas = elements.audioVisualizer;
+    const container = elements.audioVisualizerContainer;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = container.getBoundingClientRect();
+
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    AudioManager.init(canvas, updateAudioLevel);
   }
 
   // ============================================
@@ -212,6 +298,8 @@
       state.isSupported = false;
       setStatus('status-browser-error');
       elements.micButton.disabled = true;
+      updateMicIndicator('denied');
+      updateRecognitionStatus('error');
       return;
     }
 
@@ -225,13 +313,45 @@
     state.recognition.onresult = handleRecognitionResult;
     state.recognition.onerror = handleRecognitionError;
     state.recognition.onend = handleRecognitionEnd;
+
+    checkMicrophonePermission();
   }
 
-  function handleRecognitionStart() {
+  async function checkMicrophonePermission() {
+    try {
+      if (navigator.permissions && navigator.permissions.query) {
+        const result = await navigator.permissions.query({ name: 'microphone' });
+        updateMicIndicator(result.state);
+
+        result.addEventListener('change', () => {
+          updateMicIndicator(result.state);
+        });
+      } else {
+        updateMicIndicator('granted');
+      }
+    } catch (error) {
+      updateMicIndicator('granted');
+    }
+  }
+
+  async function handleRecognitionStart() {
     setRecordingState(true);
     startRecordingTimer();
     setStatus('status-listening');
+    updateRecognitionStatus('listening');
+    updateMicIndicator('recording');
     elements.micStatus.textContent = 'Listening... Speak now.';
+
+    if (typeof AudioManager !== 'undefined') {
+      showAudioVisualizer();
+      setupAudioVisualizer();
+      const result = await AudioManager.start();
+      if (result.success) {
+        AudioManager.startVisualization();
+      } else {
+        console.warn('Audio visualization not available:', result.error);
+      }
+    }
   }
 
   function handleRecognitionResult(event) {
@@ -267,6 +387,7 @@
 
   function handleRecognitionError(event) {
     console.error('Speech recognition error:', event.error);
+    updateRecognitionStatus('error');
 
     switch (event.error) {
       case 'no-speech':
@@ -275,10 +396,12 @@
         break;
       case 'audio-capture':
         setStatus('status-mic-error');
+        updateMicIndicator('denied');
         elements.micStatus.textContent = 'Microphone access denied.';
         break;
       case 'not-allowed':
         setStatus('status-mic-error');
+        updateMicIndicator('denied');
         elements.micStatus.textContent = 'Microphone permission denied.';
         break;
       case 'network':
@@ -295,9 +418,18 @@
   function handleRecognitionEnd() {
     setRecordingState(false);
     stopRecordingTimer();
+    updateRecognitionStatus('idle');
+    updateMicIndicator('granted');
+    hideAudioVisualizer();
+    updateAudioLevel(0);
+
+    if (typeof AudioManager !== 'undefined') {
+      AudioManager.stop();
+    }
 
     if (state.ignoreOnEnd) {
       state.ignoreOnEnd = false;
+      updateRecognitionStatus('error');
       return;
     }
 
@@ -311,11 +443,16 @@
     elements.micStatus.textContent = 'Recording complete';
   }
 
-  function toggleRecording() {
+  async function toggleRecording() {
     if (state.isRecording) {
       state.recognition.stop();
     } else {
       state.finalTranscript = '';
+      updateRecognitionStatus('processing');
+      
+      if (state.microphonePermission === 'unknown') {
+        updateMicIndicator('prompt');
+      }
       
       try {
         state.recognition.start();
@@ -323,6 +460,7 @@
         setStatus('status-processing');
       } catch (error) {
         console.error('Failed to start recognition:', error);
+        updateRecognitionStatus('error');
         showToast('Failed to start recording. Please try again.');
       }
     }
@@ -436,12 +574,19 @@
       state.recognition.stop();
     }
     stopRecordingTimer();
+    hideAudioVisualizer();
+    updateAudioLevel(0);
+
+    if (typeof AudioManager !== 'undefined') {
+      AudioManager.stop();
+    }
 
     state.finalTranscript = '';
     state.interimTranscript = '';
     elements.outputTextarea.value = '';
     localStorage.removeItem(STORAGE_KEY);
     elements.micStatus.textContent = 'Press to start recording';
+    updateRecognitionStatus('idle');
 
     updateWordCount();
     updateButtonStates();
@@ -458,12 +603,19 @@
       state.recognition.stop();
     }
     stopRecordingTimer();
+    hideAudioVisualizer();
+    updateAudioLevel(0);
+
+    if (typeof AudioManager !== 'undefined') {
+      AudioManager.stop();
+    }
 
     state.finalTranscript = '';
     state.interimTranscript = '';
     elements.outputTextarea.value = '';
     localStorage.removeItem(STORAGE_KEY);
     elements.micStatus.textContent = 'Press to start recording';
+    updateRecognitionStatus('idle');
 
     updateWordCount();
     updateButtonStates();
@@ -511,6 +663,22 @@
   }
 
   // ============================================
+  // CLEANUP
+  // ============================================
+
+  function cleanup() {
+    if (state.isRecording && state.recognition) {
+      state.recognition.stop();
+    }
+
+    stopRecordingTimer();
+
+    if (typeof AudioManager !== 'undefined') {
+      AudioManager.destroy();
+    }
+  }
+
+  // ============================================
   // INITIALIZATION
   // ============================================
 
@@ -520,6 +688,8 @@
     bindEvents();
     loadTranscription();
     setStatus('status-ready');
+
+    window.addEventListener('beforeunload', cleanup);
   }
 
   // Start the app when DOM is ready
