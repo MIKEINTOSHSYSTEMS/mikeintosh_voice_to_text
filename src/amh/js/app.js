@@ -11,8 +11,10 @@
   // ============================================
 
   const STORAGE_KEY = 'amharic_transcription';
+  const TITLE_STORAGE_KEY = 'amharic_transcript_title';
   const THEME_KEY = 'theme';
   const RECORDING_TIMER_INTERVAL = 1000;
+  const READING_SPEED_WPM = 200;
 
   // ============================================
   // STATE MANAGEMENT
@@ -31,6 +33,11 @@
     theme: localStorage.getItem(THEME_KEY) || 'dark',
     microphonePermission: 'unknown',
     recognitionStatus: 'idle',
+    transcriptTitle: localStorage.getItem(TITLE_STORAGE_KEY) || 'Untitled Transcript',
+    searchQuery: '',
+    searchMatches: [],
+    currentMatchIndex: -1,
+    totalSpeakingDuration: 0,
   };
 
   // ============================================
@@ -52,8 +59,6 @@
     twitterButton: document.getElementById('twitter-button'),
     newTranscriptionButton: document.getElementById('new-transcription-button'),
     resetButton: document.getElementById('reset-button'),
-    charCount: document.getElementById('char-count'),
-    wordCountValue: document.getElementById('word-count-value'),
     statusMessages: document.getElementById('status-messages'),
     toastContainer: document.getElementById('toast-container'),
     micIndicator: document.getElementById('mic-indicator'),
@@ -62,6 +67,17 @@
     statAudioLevel: document.getElementById('stat-audio-level'),
     audioVisualizer: document.getElementById('audio-visualizer'),
     audioVisualizerContainer: document.getElementById('audio-visualizer-container'),
+    transcriptTitle: document.getElementById('transcript-title'),
+    searchInput: document.getElementById('search-input'),
+    searchPrev: document.getElementById('search-prev'),
+    searchNext: document.getElementById('search-next'),
+    searchClear: document.getElementById('search-clear'),
+    searchMatchCount: document.getElementById('search-match-count'),
+    emptyState: document.getElementById('empty-state'),
+    charCount: document.getElementById('char-count'),
+    wordCountValue: document.getElementById('word-count-value'),
+    readingTime: document.getElementById('reading-time'),
+    speechDuration: document.getElementById('speech-duration'),
   };
 
   // ============================================
@@ -142,10 +158,182 @@
   function updateWordCount() {
     const text = elements.outputTextarea.value;
     const charCount = text.length;
-    const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+    const wordCount = countWords(text);
+    const readTime = calculateReadingTime(wordCount);
 
-    elements.charCount.textContent = charCount;
-    elements.wordCountValue.textContent = wordCount;
+    if (elements.charCount) {
+      elements.charCount.textContent = charCount.toLocaleString();
+    }
+    if (elements.wordCountValue) {
+      elements.wordCountValue.textContent = wordCount.toLocaleString();
+    }
+    if (elements.readingTime) {
+      elements.readingTime.textContent = readTime;
+    }
+    if (elements.speechDuration) {
+      elements.speechDuration.textContent = formatDuration(state.totalSpeakingDuration);
+    }
+
+    updateEmptyState();
+  }
+
+  function countWords(text) {
+    if (!text || text.trim() === '') return 0;
+    
+    const trimmed = text.trim();
+    
+    const ethiopicWordCount = trimmed.match(/[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\uAB00-\uAB2F\u1300-\u137F\u2D80-\u2DDF\u13A0-\u13FF\u2000-\u206F\u2D30-\u2D7F\uA6A0-\uA6FF\uA900-\uA97F\uAA00-\uAA5F\uAA60-\uAA7F\u10A0-\u10FF\u2010-\u2027\u2030-\u205E\u20A0-\u20CF]+/g);
+    
+    const latinWordCount = trimmed.match(/[a-zA-Z0-9]+/g);
+    
+    let count = 0;
+    if (ethiopicWordCount) count += ethiopicWordCount.length;
+    if (latinWordCount) count += latinWordCount.length;
+    
+    if (count === 0 && trimmed.length > 0) {
+      count = trimmed.split(/\s+/).length;
+    }
+    
+    return count;
+  }
+
+  function calculateReadingTime(wordCount) {
+    const minutes = Math.ceil(wordCount / READING_SPEED_WPM);
+    if (minutes < 1) return '< 1 min';
+    if (minutes === 1) return '1 min';
+    return `${minutes} min`;
+  }
+
+  function updateEmptyState() {
+    if (elements.emptyState) {
+      const hasText = elements.outputTextarea.value.trim().length > 0;
+      elements.emptyState.classList.toggle('hidden', hasText);
+    }
+  }
+
+  // ============================================
+  // TITLE MANAGEMENT
+  // ============================================
+
+  function saveTitle() {
+    const title = elements.transcriptTitle.value.trim() || 'Untitled Transcript';
+    state.transcriptTitle = title;
+    localStorage.setItem(TITLE_STORAGE_KEY, title);
+  }
+
+  function loadTitle() {
+    const saved = localStorage.getItem(TITLE_STORAGE_KEY);
+    if (saved) {
+      state.transcriptTitle = saved;
+      if (elements.transcriptTitle) {
+        elements.transcriptTitle.value = saved;
+      }
+    }
+  }
+
+  // ============================================
+  // SEARCH FUNCTIONALITY
+  // ============================================
+
+  function performSearch(query) {
+    state.searchQuery = query;
+    state.searchMatches = [];
+    state.currentMatchIndex = -1;
+
+    if (!query || query.length < 2) {
+      updateSearchUI();
+      return;
+    }
+
+    const text = elements.outputTextarea.value;
+    if (!text) {
+      updateSearchUI();
+      return;
+    }
+
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escapedQuery, 'gi');
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      state.searchMatches.push({
+        index: match.index,
+        length: match[0].length,
+        text: match[0],
+      });
+    }
+
+    if (state.searchMatches.length > 0) {
+      state.currentMatchIndex = 0;
+      highlightCurrentMatch();
+    }
+
+    updateSearchUI();
+  }
+
+  function navigateSearch(direction) {
+    if (state.searchMatches.length === 0) return;
+
+    if (direction === 'next') {
+      state.currentMatchIndex = (state.currentMatchIndex + 1) % state.searchMatches.length;
+    } else {
+      state.currentMatchIndex = (state.currentMatchIndex - 1 + state.searchMatches.length) % state.searchMatches.length;
+    }
+
+    highlightCurrentMatch();
+    updateSearchUI();
+  }
+
+  function highlightCurrentMatch() {
+    if (state.currentMatchIndex < 0 || state.currentMatchIndex >= state.searchMatches.length) {
+      return;
+    }
+
+    const match = state.searchMatches[state.currentMatchIndex];
+    const textarea = elements.outputTextarea;
+
+    textarea.focus();
+    textarea.setSelectionRange(match.index, match.index + match.length);
+
+    const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 28;
+    const linesBeforeMatch = textarea.value.substr(0, match.index).split('\n').length;
+    const targetScrollTop = (linesBeforeMatch - 3) * lineHeight;
+    textarea.scrollTop = Math.max(0, targetScrollTop);
+  }
+
+  function clearSearch() {
+    elements.searchInput.value = '';
+    state.searchQuery = '';
+    state.searchMatches = [];
+    state.currentMatchIndex = -1;
+    updateSearchUI();
+    elements.outputTextarea.focus();
+  }
+
+  function updateSearchUI() {
+    const hasQuery = state.searchQuery && state.searchQuery.length >= 2;
+    const matchCount = state.searchMatches.length;
+    const hasMatches = matchCount > 0;
+
+    if (elements.searchMatchCount) {
+      if (!hasQuery) {
+        elements.searchMatchCount.textContent = '';
+      } else if (hasMatches) {
+        elements.searchMatchCount.textContent = `${state.currentMatchIndex + 1} of ${matchCount}`;
+      } else {
+        elements.searchMatchCount.textContent = 'No matches';
+      }
+    }
+
+    if (elements.searchPrev) {
+      elements.searchPrev.disabled = !hasMatches;
+    }
+    if (elements.searchNext) {
+      elements.searchNext.disabled = !hasMatches;
+    }
+    if (elements.searchClear) {
+      elements.searchClear.disabled = !hasQuery;
+    }
   }
 
   function updateButtonStates() {
@@ -417,6 +605,7 @@
 
   function handleRecognitionEnd() {
     setRecordingState(false);
+    state.totalSpeakingDuration += state.recordingDuration;
     stopRecordingTimer();
     updateRecognitionStatus('idle');
     updateMicIndicator('granted');
@@ -441,6 +630,7 @@
 
     setStatus('status-ready');
     elements.micStatus.textContent = 'Recording complete';
+    updateWordCount();
   }
 
   async function toggleRecording() {
@@ -504,7 +694,7 @@
 
     const blob = new Blob([text], { type: mimeType });
     const url = URL.createObjectURL(blob);
-    const filename = `amharic_transcription.${extension}`;
+    const filename = `${state.transcriptTitle.replace(/[^a-zA-Z0-9\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\uAB00-\uAB2F\u13A0-\u13FF\u2D30-\u2D7F\uA6A0-\uA6FF\uA900-\uA97F\uAA00-\uAA5F\uAA60-\uAA7F\u10A0-\u10FF]/g, '_') || 'amharic_transcription'}.${extension}`;
 
     const link = document.createElement('a');
     link.href = url;
@@ -520,12 +710,13 @@
     if (!text) return;
 
     const safeText = escapeHTML(text);
+    const safeTitle = escapeHTML(state.transcriptTitle);
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Amharic Transcription</title>
+        <title>${safeTitle}</title>
         <style>
           body { font-family: 'Noto Sans Ethiopic', sans-serif; padding: 2rem; line-height: 1.8; }
           h1 { font-size: 1.5rem; margin-bottom: 1rem; }
@@ -533,7 +724,7 @@
         </style>
       </head>
       <body>
-        <h1>Amharic Voice-to-Text Transcription</h1>
+        <h1>${safeTitle}</h1>
         <div class="content">${safeText}</div>
       </body>
       </html>
@@ -583,10 +774,17 @@
 
     state.finalTranscript = '';
     state.interimTranscript = '';
+    state.totalSpeakingDuration = 0;
     elements.outputTextarea.value = '';
     localStorage.removeItem(STORAGE_KEY);
     elements.micStatus.textContent = 'Press to start recording';
     updateRecognitionStatus('idle');
+
+    state.transcriptTitle = 'Untitled Transcript';
+    localStorage.removeItem(TITLE_STORAGE_KEY);
+    elements.transcriptTitle.value = 'Untitled Transcript';
+
+    clearSearch();
 
     updateWordCount();
     updateButtonStates();
@@ -612,10 +810,17 @@
 
     state.finalTranscript = '';
     state.interimTranscript = '';
+    state.totalSpeakingDuration = 0;
     elements.outputTextarea.value = '';
     localStorage.removeItem(STORAGE_KEY);
     elements.micStatus.textContent = 'Press to start recording';
     updateRecognitionStatus('idle');
+
+    state.transcriptTitle = 'Untitled Transcript';
+    localStorage.removeItem(TITLE_STORAGE_KEY);
+    elements.transcriptTitle.value = 'Untitled Transcript';
+
+    clearSearch();
 
     updateWordCount();
     updateButtonStates();
@@ -643,10 +848,33 @@
     elements.newTranscriptionButton.addEventListener('click', newTranscription);
     elements.resetButton.addEventListener('click', resetTranscription);
 
-    // Save on textarea change (manual edits)
-    elements.outputTextarea.addEventListener('input', saveTranscription);
+    elements.outputTextarea.addEventListener('input', () => {
+      saveTranscription();
+      updateWordCount();
+    });
 
-    // Keyboard accessibility
+    elements.transcriptTitle.addEventListener('input', saveTitle);
+
+    elements.searchInput.addEventListener('input', (e) => {
+      performSearch(e.target.value);
+    });
+    elements.searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          navigateSearch('prev');
+        } else {
+          navigateSearch('next');
+        }
+      }
+      if (e.key === 'Escape') {
+        clearSearch();
+      }
+    });
+    elements.searchPrev.addEventListener('click', () => navigateSearch('prev'));
+    elements.searchNext.addEventListener('click', () => navigateSearch('next'));
+    elements.searchClear.addEventListener('click', clearSearch);
+
     elements.micButton.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -687,6 +915,8 @@
     initSpeechRecognition();
     bindEvents();
     loadTranscription();
+    loadTitle();
+    updateWordCount();
     setStatus('status-ready');
 
     window.addEventListener('beforeunload', cleanup);
