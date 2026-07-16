@@ -34,8 +34,20 @@
       <section class="glass-card transcription-section" aria-label="Transcription Controls">
         <div class="recording-dashboard" role="region" aria-label="Recording Dashboard">
           <div class="dashboard-header">
-            <span class="mic-indicator" id="mic-indicator" aria-label="Microphone status: unknown"></span>
-            <span class="dashboard-title">Recording Dashboard</span>
+            <div class="dashboard-header-left">
+              <span class="mic-indicator" id="mic-indicator" aria-label="Microphone status: unknown"></span>
+              <span class="dashboard-title">Recording Dashboard</span>
+            </div>
+            <div class="dashboard-header-actions">
+              <button id="history-button" class="btn btn-secondary btn-sm" aria-label="Open transcript history" title="History">
+                <span class="btn-icon" aria-hidden="true">&#128216;</span>
+                <span class="btn-text">History</span>
+              </button>
+              <button id="settings-button" class="btn btn-secondary btn-sm" aria-label="Open settings" title="Settings">
+                <span class="btn-icon" aria-hidden="true">&#9881;&#65039;</span>
+                <span class="btn-text">Settings</span>
+              </button>
+            </div>
           </div>
 
           <div class="dashboard-content">
@@ -91,14 +103,6 @@
         </div>
 
         <div class="controls">
-          <button id="history-button" class="btn btn-secondary" aria-label="Open transcript history" title="History">
-            <span class="btn-icon" aria-hidden="true">&#128216;</span>
-            History
-          </button>
-          <button id="settings-button" class="btn btn-secondary" aria-label="Open settings" title="Settings">
-            <span class="btn-icon" aria-hidden="true">&#9881;&#65039;</span>
-            Settings
-          </button>
           <button id="copy-button" class="btn btn-secondary" disabled aria-label="Copy transcription to clipboard">
             <span class="btn-icon" aria-hidden="true">📋</span>
             Copy
