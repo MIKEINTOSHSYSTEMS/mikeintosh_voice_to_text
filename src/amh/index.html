@@ -208,6 +208,87 @@
         </div>
       </section>
 
+      <section class="glass-card ai-assistant-section" id="ai-assistant-section" aria-label="AI Assistant">
+        <div class="ai-header">
+          <h2 class="ai-title">AI Assistant</h2>
+          <span class="ai-badge" id="ai-provider-badge" aria-label="AI provider status">Not configured</span>
+        </div>
+
+        <div class="ai-actions">
+          <div class="ai-action-group">
+            <span class="ai-group-label">Improve</span>
+            <button id="ai-improve-btn" class="btn btn-secondary ai-btn" disabled aria-label="Improve transcript text">
+              <span class="btn-icon" aria-hidden="true">&#9998;</span>
+              Improve Text
+            </button>
+          </div>
+
+          <div class="ai-action-group">
+            <span class="ai-group-label">Summarize</span>
+            <button id="ai-summary-short-btn" class="btn btn-secondary ai-btn" disabled aria-label="Generate short summary">
+              <span class="btn-icon" aria-hidden="true">&#128196;</span>
+              Short
+            </button>
+            <button id="ai-summary-detailed-btn" class="btn btn-secondary ai-btn" disabled aria-label="Generate detailed summary">
+              <span class="btn-icon" aria-hidden="true">&#128203;</span>
+              Detailed
+            </button>
+            <button id="ai-summary-meeting-btn" class="btn btn-secondary ai-btn" disabled aria-label="Generate meeting summary">
+              <span class="btn-icon" aria-hidden="true">&#128198;</span>
+              Meeting
+            </button>
+          </div>
+
+          <div class="ai-action-group">
+            <span class="ai-group-label">Translate</span>
+            <select id="ai-translate-target" class="setting-select ai-translate-select" aria-label="Translate to language" disabled>
+              <option value="en">English</option>
+              <option value="am">Amharic</option>
+            </select>
+            <button id="ai-translate-btn" class="btn btn-secondary ai-btn" disabled aria-label="Translate transcript">
+              <span class="btn-icon" aria-hidden="true">&#127760;</span>
+              Translate
+            </button>
+          </div>
+
+          <div class="ai-action-group">
+            <span class="ai-group-label">Analyze</span>
+            <button id="ai-keypoints-btn" class="btn btn-secondary ai-btn" disabled aria-label="Extract key points">
+              <span class="btn-icon" aria-hidden="true">&#10003;</span>
+              Key Points
+            </button>
+            <button id="ai-keywords-btn" class="btn btn-secondary ai-btn" disabled aria-label="Extract keywords">
+              <span class="btn-icon" aria-hidden="true">#</span>
+              Keywords
+            </button>
+          </div>
+        </div>
+
+        <div class="ai-status" id="ai-status" hidden>
+          <span class="ai-status-icon" id="ai-status-icon" aria-hidden="true"></span>
+          <span class="ai-status-text" id="ai-status-text"></span>
+        </div>
+
+        <div class="ai-result" id="ai-result" hidden>
+          <div class="ai-result-header">
+            <span class="ai-result-title" id="ai-result-title">AI Result</span>
+            <div class="ai-result-actions">
+              <button id="ai-apply-btn" class="btn btn-primary btn-sm" title="Apply to transcript">
+                <span class="btn-icon" aria-hidden="true">&#10003;</span>
+                Apply
+              </button>
+              <button id="ai-copy-result-btn" class="btn btn-secondary btn-sm" title="Copy result">
+                <span class="btn-icon" aria-hidden="true">&#128203;</span>
+              </button>
+              <button id="ai-close-result-btn" class="btn btn-secondary btn-sm" title="Dismiss">
+                <span class="btn-icon" aria-hidden="true">&#10005;</span>
+              </button>
+            </div>
+          </div>
+          <div class="ai-result-body" id="ai-result-body"></div>
+        </div>
+      </section>
+
       <section class="glass-card transcription-output" aria-label="Transcription Workspace">
         <div class="workspace-header">
           <div class="workspace-title-row">
@@ -401,6 +482,12 @@
   <script src="js/history-ui.js"></script>
   <script src="js/settings-ui.js"></script>
   <script src="js/pwa.js"></script>
+  <script src="prompts/prompts.js"></script>
+  <script src="js/ai/ai-service.js"></script>
+  <script src="js/ai/summarizer.js"></script>
+  <script src="js/ai/translator.js"></script>
+  <script src="js/ai/analyzer.js"></script>
+  <script src="js/ai/ai-ui.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

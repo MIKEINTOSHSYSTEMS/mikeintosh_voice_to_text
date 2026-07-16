@@ -7,7 +7,7 @@
  * Does NOT intercept Web Speech API requests.
  */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const CACHE_NAME = 'amvtt-shell-' + CACHE_VERSION;
 
 var APP_SHELL = [
@@ -30,6 +30,12 @@ var APP_SHELL = [
   './js/transcription-engine.js',
   './js/speech.js',
   './js/pwa.js',
+  './prompts/prompts.js',
+  './js/ai/ai-service.js',
+  './js/ai/summarizer.js',
+  './js/ai/translator.js',
+  './js/ai/analyzer.js',
+  './js/ai/ai-ui.js',
   './assets/favicon.png',
   './assets/mikeintosh_systems_sm.png',
   './assets/mic-animate.gif',

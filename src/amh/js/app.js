@@ -67,6 +67,24 @@
     playerSpeedSelect: document.getElementById('player-speed-select'),
     playerMuteBtn: document.getElementById('player-mute-btn'),
     playerVolumeSlider: document.getElementById('player-volume-slider'),
+    aiProviderBadge: document.getElementById('ai-provider-badge'),
+    aiImproveBtn: document.getElementById('ai-improve-btn'),
+    aiSummaryShortBtn: document.getElementById('ai-summary-short-btn'),
+    aiSummaryDetailedBtn: document.getElementById('ai-summary-detailed-btn'),
+    aiSummaryMeetingBtn: document.getElementById('ai-summary-meeting-btn'),
+    aiTranslateTarget: document.getElementById('ai-translate-target'),
+    aiTranslateBtn: document.getElementById('ai-translate-btn'),
+    aiKeypointsBtn: document.getElementById('ai-keypoints-btn'),
+    aiKeywordsBtn: document.getElementById('ai-keywords-btn'),
+    aiStatus: document.getElementById('ai-status'),
+    aiStatusIcon: document.getElementById('ai-status-icon'),
+    aiStatusText: document.getElementById('ai-status-text'),
+    aiResult: document.getElementById('ai-result'),
+    aiResultTitle: document.getElementById('ai-result-title'),
+    aiResultBody: document.getElementById('ai-result-body'),
+    aiApplyBtn: document.getElementById('ai-apply-btn'),
+    aiCopyResultBtn: document.getElementById('ai-copy-result-btn'),
+    aiCloseResultBtn: document.getElementById('ai-close-result-btn'),
   };
 
   let transcriptTitle = 'Untitled Transcript';
@@ -111,13 +129,8 @@
 
   function setRecordingState(isRecording) {
     elements.micButton.setAttribute('aria-pressed', isRecording.toString());
-    elements.micButton.setAttribute(
-      'aria-label',
-      isRecording ? 'Stop voice recording' : 'Start voice recording'
-    );
-    elements.micStatus.textContent = isRecording
-      ? 'Listening... Click to stop'
-      : 'Press to start recording';
+    elements.micButton.setAttribute('aria-label', isRecording ? 'Stop voice recording' : 'Start voice recording');
+    elements.micStatus.textContent = isRecording ? 'Listening... Click to stop' : 'Press to start recording';
   }
 
   function updateButtonStates() {
@@ -132,39 +145,21 @@
   }
 
   function updateMicIndicator(permissionState) {
-    if (elements.micIndicator) {
-      elements.micIndicator.setAttribute('data-state', permissionState);
-      const labels = {
-        unknown: 'Microphone status: unknown',
-        granted: 'Microphone available',
-        denied: 'Microphone permission denied',
-        prompt: 'Microphone permission requested',
-        recording: 'Microphone active',
-      };
-      elements.micIndicator.setAttribute('aria-label', labels[permissionState] || 'Microphone status unknown');
-    }
+    if (!elements.micIndicator) return;
+    elements.micIndicator.setAttribute('data-state', permissionState);
+    var labels = { unknown: 'Microphone status: unknown', granted: 'Microphone available', denied: 'Microphone permission denied', prompt: 'Microphone permission requested', recording: 'Microphone active' };
+    elements.micIndicator.setAttribute('aria-label', labels[permissionState] || 'Microphone status unknown');
   }
 
   function updateRecognitionStatusDisplay(status) {
-    if (elements.recognitionStatus) {
-      const labels = {
-        idle: 'Idle',
-        listening: 'Listening',
-        processing: 'Processing',
-        error: 'Error',
-      };
-      elements.recognitionStatus.textContent = labels[status] || status;
-    }
+    if (!elements.recognitionStatus) return;
+    var labels = { idle: 'Idle', listening: 'Listening', processing: 'Processing', error: 'Error' };
+    elements.recognitionStatus.textContent = labels[status] || status;
   }
 
   function updateAudioLevel(level) {
     if (elements.statAudioLevel) {
-      if (level > 0.01) {
-        const percentage = Math.round(level * 100);
-        elements.statAudioLevel.textContent = `${percentage}%`;
-      } else {
-        elements.statAudioLevel.textContent = '--';
-      }
+      elements.statAudioLevel.textContent = level > 0.01 ? Math.round(level * 100) + '%' : '--';
     }
   }
 
@@ -554,6 +549,90 @@
   }
 
   // ============================================
+  // AI FEATURES INITIALIZATION
+  // ============================================
+
+  function initAIFeatures() {
+    var aiService = null;
+
+    function getOrCreateAIService() {
+      if (aiService) return aiService;
+      try {
+        aiService = AIService.create({ provider: 'openai', apiKey: '', model: 'gpt-4o-mini', timeout: 30000 });
+        return aiService;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    AIUI.init({
+      elements: {
+        badge: elements.aiProviderBadge,
+        improveBtn: elements.aiImproveBtn,
+        summaryShortBtn: elements.aiSummaryShortBtn,
+        summaryDetailedBtn: elements.aiSummaryDetailedBtn,
+        summaryMeetingBtn: elements.aiSummaryMeetingBtn,
+        translateTarget: elements.aiTranslateTarget,
+        translateBtn: elements.aiTranslateBtn,
+        keypointsBtn: elements.aiKeypointsBtn,
+        keywordsBtn: elements.aiKeywordsBtn,
+        status: elements.aiStatus,
+        statusIcon: elements.aiStatusIcon,
+        statusText: elements.aiStatusText,
+        result: elements.aiResult,
+        resultTitle: elements.aiResultTitle,
+        resultBody: elements.aiResultBody,
+        applyBtn: elements.aiApplyBtn,
+        copyResultBtn: elements.aiCopyResultBtn,
+        closeResultBtn: elements.aiCloseResultBtn,
+      },
+      callbacks: {
+        getTranscript: function () { return elements.outputTextarea.value; },
+        onApply: function (text) {
+          elements.outputTextarea.value = text;
+          SpeechManager.setFinalTranscript(text);
+          saveTranscription();
+          updateWordCount();
+          updateButtonStates();
+        },
+        showToast: showToast,
+      },
+    });
+
+    SettingsManager.onChange(function (key, value) {
+      if (key === 'aiProvider' || key === 'aiApiKey' || key === 'aiModel') {
+        refreshAIServices();
+      }
+    });
+  }
+
+  function refreshAIServices() {
+    var provider = SettingsManager.get('aiProvider') || 'openai';
+    var apiKey = SettingsManager.get('aiApiKey') || '';
+    var model = SettingsManager.get('aiModel') || 'gpt-4o-mini';
+
+    if (!apiKey) {
+      AIUI.updateProviderBadge(false);
+      AIUI.setButtonsEnabled(false);
+      return;
+    }
+
+    try {
+      var service = AIService.create({ provider: provider, apiKey: apiKey, model: model, timeout: 30000 });
+      var summarizerInst = AISummarizer.create({ aiService: service });
+      var translatorInst = AITranslator.create({ aiService: service });
+      var analyzerInst = AIAnalyzer.create({ aiService: service });
+
+      AIUI.setServices(summarizerInst, translatorInst, analyzerInst);
+      AIUI.updateProviderBadge(true);
+      AIUI.setButtonsEnabled(true);
+    } catch (e) {
+      AIUI.updateProviderBadge(false);
+      AIUI.setButtonsEnabled(false);
+    }
+  }
+
+  // ============================================
   // INITIALIZATION
   // ============================================
 
@@ -573,15 +652,8 @@
       },
       language: SettingsUI.getSpeechLanguage(),
       callbacks: {
-        onRecordingStart: () => {
-          setRecordingState(true);
-          setStatus('status-listening');
-          elements.micStatus.textContent = 'Listening... Speak now.';
-        },
-        onRecordingEnd: (duration) => {
-          setRecordingState(false);
-          updateWordCount();
-        },
+        onRecordingStart: () => { setRecordingState(true); setStatus('status-listening'); elements.micStatus.textContent = 'Listening... Speak now.'; },
+        onRecordingEnd: () => { setRecordingState(false); updateWordCount(); },
         onAudioVisualizerStart: async () => {
           showAudioVisualizer();
           setupAudioVisualizer();
@@ -601,68 +673,34 @@
             AudioManager.stop();
           }
         },
-        onTranscriptUpdate: (newText, isAppend) => {
-          handleTranscriptUpdate(newText, isAppend);
-        },
-        onInterimUpdate: (interimText) => {
-          elements.micStatus.textContent = 'Processing speech...';
-        },
+        onTranscriptUpdate: (newText, isAppend) => { handleTranscriptUpdate(newText, isAppend); },
+        onInterimUpdate: () => { elements.micStatus.textContent = 'Processing speech...'; },
         onError: (error) => {
-          switch (error) {
-            case 'no-speech':
-              setStatus('status-no-speech');
-              elements.micStatus.textContent = 'No speech detected. Try again.';
-              break;
-            case 'audio-capture':
-              setStatus('status-mic-error');
-              updateMicIndicator('denied');
-              elements.micStatus.textContent = 'Microphone access denied.';
-              break;
-            case 'not-allowed':
-              setStatus('status-mic-error');
-              updateMicIndicator('denied');
-              elements.micStatus.textContent = 'Microphone permission denied.';
-              break;
-            case 'network':
-              showToast('Network error. Check your connection.');
-              break;
-            case 'start-failed':
-              showToast('Failed to start recording. Please try again.');
-              break;
-            default:
-              setStatus('status-error');
-              elements.micStatus.textContent = 'An error occurred.';
+          var msgs = {
+            'no-speech': ['status-no-speech', 'No speech detected. Try again.'],
+            'audio-capture': ['status-mic-error', 'Microphone access denied.'],
+            'not-allowed': ['status-mic-error', 'Microphone permission denied.'],
+          };
+          if (msgs[error]) {
+            setStatus(msgs[error][0]);
+            if (error !== 'no-speech') updateMicIndicator('denied');
+            elements.micStatus.textContent = msgs[error][1];
+          } else if (error === 'network') {
+            showToast('Network error. Check your connection.');
+          } else if (error === 'start-failed') {
+            showToast('Failed to start recording. Please try again.');
+          } else {
+            setStatus('status-error');
+            elements.micStatus.textContent = 'An error occurred.';
           }
         },
-        onIdle: () => {
-          setStatus('status-ready');
-          elements.micStatus.textContent = 'Press to start recording';
-        },
-        onComplete: (duration) => {
-          setStatus('status-ready');
-          elements.micStatus.textContent = 'Recording complete';
-          updateWordCount();
-        },
-        onProcessing: () => {
-          setStatus('status-processing');
-        },
-        onMicIndicatorUpdate: (state) => {
-          updateMicIndicator(state);
-        },
-        onRecognitionStatusUpdate: (status) => {
-          updateRecognitionStatusDisplay(status);
-        },
-        onTimerUpdate: (duration, formatted) => {
-          if (elements.statDuration) {
-            elements.statDuration.textContent = formatted;
-          }
-        },
-        onUnsupported: () => {
-          setStatus('status-browser-error');
-          elements.micButton.disabled = true;
-          updateMicIndicator('denied');
-          updateRecognitionStatusDisplay('error');
-        },
+        onIdle: () => { setStatus('status-ready'); elements.micStatus.textContent = 'Press to start recording'; },
+        onComplete: () => { setStatus('status-ready'); elements.micStatus.textContent = 'Recording complete'; updateWordCount(); },
+        onProcessing: () => setStatus('status-processing'),
+        onMicIndicatorUpdate: (state) => updateMicIndicator(state),
+        onRecognitionStatusUpdate: (status) => updateRecognitionStatusDisplay(status),
+        onTimerUpdate: (duration, formatted) => { if (elements.statDuration) elements.statDuration.textContent = formatted; },
+        onUnsupported: () => { setStatus('status-browser-error'); elements.micButton.disabled = true; updateMicIndicator('denied'); updateRecognitionStatusDisplay('error'); },
       },
     });
 
@@ -692,43 +730,27 @@
     initApp();
 
     PwaManager.init();
+    initAIFeatures();
 
     AudioUploadManager.init({
-      elements: {
-        dropZone: elements.uploadDropZone,
-        fileInput: elements.uploadFileInput,
-      },
+      elements: { dropZone: elements.uploadDropZone, fileInput: elements.uploadFileInput },
       callbacks: {
         onStateChange: function (state) {
-          var isError = state === 'error';
-          var isLoading = state === 'loading';
-          var isIdle = state === 'idle';
+          var isError = state === 'error', isLoading = state === 'loading', isIdle = state === 'idle';
           elements.uploadStatus.hidden = isIdle;
-          elements.uploadFileInfo.hidden = !isIdle && !isError ? false : true;
-          if (isLoading) {
-            elements.uploadStatus.setAttribute('data-state', 'loading');
-            elements.uploadStatusIcon.textContent = '\u23F3';
-            elements.uploadStatusText.textContent = 'Loading audio file...';
-          } else if (isError) {
-            elements.uploadStatus.setAttribute('data-state', 'error');
-            elements.uploadStatusIcon.textContent = '\u26A0\uFE0F';
-          }
+          elements.uploadFileInfo.hidden = !(isIdle || isError);
+          if (isLoading) { elements.uploadStatus.setAttribute('data-state', 'loading'); elements.uploadStatusIcon.textContent = '\u23F3'; elements.uploadStatusText.textContent = 'Loading audio file...'; }
+          else if (isError) { elements.uploadStatus.setAttribute('data-state', 'error'); elements.uploadStatusIcon.textContent = '\u26A0\uFE0F'; }
         },
         onFileLoaded: function (data) {
-          elements.uploadStatus.hidden = true;
-          elements.uploadFileInfo.hidden = false;
-          elements.uploadExperimental.hidden = false;
-          elements.uploadFileName.textContent = data.metadata.name;
-          elements.uploadFormat.textContent = data.metadata.format;
-          elements.uploadSize.textContent = data.metadata.sizeFormatted;
-          elements.uploadDuration.textContent = data.metadata.durationFormatted;
+          elements.uploadStatus.hidden = true; elements.uploadFileInfo.hidden = false; elements.uploadExperimental.hidden = false;
+          elements.uploadFileName.textContent = data.metadata.name; elements.uploadFormat.textContent = data.metadata.format;
+          elements.uploadSize.textContent = data.metadata.sizeFormatted; elements.uploadDuration.textContent = data.metadata.durationFormatted;
           AudioPlayerManager.load(data.metadata.objectUrl, data.metadata);
         },
         onError: function (message) {
-          elements.uploadStatus.hidden = false;
-          elements.uploadStatus.setAttribute('data-state', 'error');
-          elements.uploadStatusIcon.textContent = '\u26A0\uFE0F';
-          elements.uploadStatusText.textContent = message;
+          elements.uploadStatus.hidden = false; elements.uploadStatus.setAttribute('data-state', 'error');
+          elements.uploadStatusIcon.textContent = '\u26A0\uFE0F'; elements.uploadStatusText.textContent = message;
           elements.uploadFileInfo.hidden = true;
         },
       },
@@ -742,17 +764,11 @@
 
     AudioPlayerManager.init({
       elements: {
-        playerContainer: elements.playerContainer,
-        fileName: elements.playerFileName,
-        playPauseBtn: elements.playerPlayPause,
-        stopBtn: elements.playerStop,
-        progressBar: elements.playerProgressBar,
-        progressFill: elements.playerProgressFill,
-        currentTime: elements.playerCurrentTime,
-        totalDuration: elements.playerTotalDuration,
-        speedSelect: elements.playerSpeedSelect,
-        muteBtn: elements.playerMuteBtn,
-        volumeSlider: elements.playerVolumeSlider,
+        playerContainer: elements.playerContainer, fileName: elements.playerFileName,
+        playPauseBtn: elements.playerPlayPause, stopBtn: elements.playerStop,
+        progressBar: elements.playerProgressBar, progressFill: elements.playerProgressFill,
+        currentTime: elements.playerCurrentTime, totalDuration: elements.playerTotalDuration,
+        speedSelect: elements.playerSpeedSelect, muteBtn: elements.playerMuteBtn, volumeSlider: elements.playerVolumeSlider,
       },
       callbacks: { onError: function (msg) { showToast(msg); } },
     });
