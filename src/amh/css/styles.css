@@ -295,52 +295,6 @@ body::before {
 }
 
 /* ============================================
-   HEADER ACTIONS
-   ============================================ */
-
-.header-actions {
-  position: absolute;
-  top: var(--space-4);
-  left: var(--space-4);
-  display: flex;
-  gap: var(--space-2);
-}
-
-.header-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background: var(--bg-glass);
-  border: var(--glass-border);
-  border-radius: var(--radius-xl);
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  transition: all var(--transition-base);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-}
-
-.header-action-btn:hover {
-  background: var(--bg-glass-hover);
-  color: var(--text-accent);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-primary);
-}
-
-.header-action-icon {
-  font-size: var(--font-size-base);
-  line-height: 1;
-}
-
-.header-action-text {
-  display: inline;
-}
-
-/* ============================================
    PANEL OVERLAY
    ============================================ */
 
@@ -1813,19 +1767,6 @@ body::before {
     font-size: var(--font-size-2xl);
   }
 
-  .header-actions {
-    top: var(--space-3);
-    left: var(--space-3);
-  }
-
-  .header-action-text {
-    display: none;
-  }
-
-  .header-action-btn {
-    padding: var(--space-2);
-  }
-
   .theme-toggle {
     top: var(--space-3);
     right: var(--space-3);
@@ -2043,7 +1984,6 @@ body::before {
   .mic-wrapper,
   .output-footer,
   .theme-toggle,
-  .header-actions,
   .toast-container,
   .history-panel,
   .history-overlay,
