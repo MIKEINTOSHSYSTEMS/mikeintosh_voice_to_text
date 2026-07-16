@@ -305,6 +305,16 @@
     </div>
   </div>
 
+  <div id="offline-banner" class="pwa-banner pwa-banner-offline" hidden role="alert">
+    <span class="pwa-banner-icon" aria-hidden="true">&#128268;</span>
+    <span>You are offline. Transcription requires internet.</span>
+  </div>
+  <div id="update-banner" class="pwa-banner pwa-banner-update" hidden role="status">
+    <span class="pwa-banner-icon" aria-hidden="true">&#128640;</span>
+    <span>A new version is available.</span>
+    <button id="update-refresh" class="btn btn-sm pwa-banner-btn">Refresh</button>
+  </div>
+
   <script src="js/storage.js"></script>
   <script src="js/settings.js"></script>
   <script src="js/theme.js"></script>

@@ -62,6 +62,13 @@ self.addEventListener('activate', function (event) {
   self.clients.claim();
 });
 
+// Message handler: skip waiting on user refresh
+self.addEventListener('message', function (event) {
+  if (event.data && event.data.type === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});
+
 // Fetch: cache-first for app shell, network-only for everything else
 self.addEventListener('fetch', function (event) {
   var requestUrl = new URL(event.request.url);
