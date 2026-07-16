@@ -1,0 +1,18 @@
+{
+  "name": "@voicetext/shared",
+  "version": "2.0.0-alpha.1",
+  "private": true,
+  "description": "VoiceText shared types and validation",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

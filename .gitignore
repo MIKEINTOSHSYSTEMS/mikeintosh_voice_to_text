@@ -1,3 +1,41 @@
+# ─── Dependencies ───
+node_modules/
+.pnpm-store/
+
+# ─── Build Output ───
+dist/
+build/
+*.tsbuildinfo
+
+# ─── Environment ───
+.env
+.env.local
+.env.*.local
+
+# ─── IDE ───
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── OS ───
+.DS_Store
+Thumbs.db
+
+# ─── Logs ───
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# ─── Sessions ───
 sessions/
+
+# ─── Notes (scratch files) ───
 notes/0*.txt
 notes/00*.txt
+
+# ─── Docker ───
+docker-compose.override.yml
+
+# ─── Prisma ───
+packages/api/prisma/migrations/**/migration_lock.toml
