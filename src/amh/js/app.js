@@ -513,63 +513,51 @@
     });
 
     elements.micButton.addEventListener('click', () => {
-      SpeechManager.toggle();
+      if (TranscriptionEngine.getIsRunning()) {
+        TranscriptionEngine.stop();
+        SpeechManager.stop();
+        setRecordingState(false);
+        setStatus('status-ready');
+      } else if (AudioUploadManager.getState() === 'loaded') {
+        TranscriptionEngine.start('file', AudioPlayerManager);
+        setRecordingState(true);
+        setStatus('status-listening');
+      } else {
+        SpeechManager.toggle();
+      }
     });
 
     elements.copyButton.addEventListener('click', copyToClipboard);
     elements.printButton.addEventListener('click', printTranscription);
-    elements.downloadTxtButton.addEventListener('click', () =>
-      saveAsFile('txt', 'text/plain')
-    );
-    elements.downloadDocButton.addEventListener('click', () =>
-      saveAsFile('doc', 'application/msword')
-    );
+    elements.downloadTxtButton.addEventListener('click', () => saveAsFile('txt', 'text/plain'));
+    elements.downloadDocButton.addEventListener('click', () => saveAsFile('doc', 'application/msword'));
     elements.whatsappButton.addEventListener('click', shareOnWhatsApp);
     elements.twitterButton.addEventListener('click', shareOnTwitter);
     elements.newTranscriptionButton.addEventListener('click', newTranscription);
     elements.resetButton.addEventListener('click', resetTranscription);
 
     elements.outputTextarea.addEventListener('input', function () {
-      if (typeof SettingsUI !== 'undefined' && SettingsUI.isAutoSave()) {
-        saveTranscription();
-      }
+      if (typeof SettingsUI !== 'undefined' && SettingsUI.isAutoSave()) saveTranscription();
       updateWordCount();
     });
 
     elements.transcriptTitle.addEventListener('input', saveTitle);
 
-    elements.searchInput.addEventListener('input', (e) => {
-      SearchManager.search(e.target.value);
-    });
+    elements.searchInput.addEventListener('input', (e) => SearchManager.search(e.target.value));
     elements.searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        if (e.shiftKey) {
-          SearchManager.navigate('prev');
-        } else {
-          SearchManager.navigate('next');
-        }
-      }
-      if (e.key === 'Escape') {
-        SearchManager.clear();
-      }
+      if (e.key === 'Enter') { e.preventDefault(); e.shiftKey ? SearchManager.navigate('prev') : SearchManager.navigate('next'); }
+      if (e.key === 'Escape') SearchManager.clear();
     });
     elements.searchPrev.addEventListener('click', () => SearchManager.navigate('prev'));
     elements.searchNext.addEventListener('click', () => SearchManager.navigate('next'));
     elements.searchClear.addEventListener('click', () => SearchManager.clear());
 
     elements.micButton.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        SpeechManager.toggle();
-      }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); SpeechManager.toggle(); }
     });
 
     elements.themeToggle.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        ThemeManager.toggle();
-      }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ThemeManager.toggle(); }
     });
   }
 
@@ -785,6 +773,14 @@
         volumeSlider: elements.playerVolumeSlider,
       },
       callbacks: { onError: function (msg) { showToast(msg); } },
+    });
+
+    TranscriptionEngine.init({
+      callbacks: {
+        onError: function (msg) { showToast(msg); },
+        onFileTranscriptionStart: function () { setRecordingState(true); setStatus('status-listening'); },
+        onTranscriptionStop: function () { setRecordingState(false); setStatus('status-ready'); },
+      },
     });
   }
 
