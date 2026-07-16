@@ -19,14 +19,17 @@
     "@fastify/cors": "^10.0.1",
     "@fastify/env": "^5.0.1",
     "@fastify/jwt": "^9.0.1",
+    "@fastify/swagger": "^9.8.1",
     "@prisma/client": "^6.9.0",
-    "bcrypt": "^5.1.1",
+    "@scalar/fastify-api-reference": "^1.62.9",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/bcryptjs": "^3.0.0",
     "@types/node": "^22.12.0",
     "prisma": "^6.9.0",
     "tsx": "^4.19.3",

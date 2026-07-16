@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { prisma } from "../lib/prisma.js";
 import { ConflictError, UnauthorizedError, NotFoundError } from "../lib/errors.js";
 import type { RegisterInput, LoginInput } from "../validation/auth.js";

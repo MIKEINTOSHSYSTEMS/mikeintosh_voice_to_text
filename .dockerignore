@@ -1,0 +1,7 @@
+**/node_modules
+.git
+*.md
+notes
+*.log
+.env
+apps/web/node_modules

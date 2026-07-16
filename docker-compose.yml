@@ -1,9 +1,7 @@
-version: "3.9"
-
 services:
-  postgres:
+  mikeintoshtranscriber_db:
     image: postgres:16-alpine
-    container_name: voicetext-db
+    container_name: mikeintoshtranscriber_db
     restart: unless-stopped
     ports:
       - "5432:5432"
@@ -11,27 +9,86 @@ services:
       POSTGRES_USER: voicetext
       POSTGRES_PASSWORD: voicetext_dev
       POSTGRES_DB: voicetext
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      mikeintoshtranscribernet:
+        ipv4_address: 172.28.0.10
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U voicetext"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  redis:
+  mikeintoshtranscriber_redis:
     image: redis:7-alpine
-    container_name: voicetext-redis
+    container_name: mikeintoshtranscriber_redis
     restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      mikeintoshtranscribernet:
+        ipv4_address: 172.28.0.11
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  mikeintoshtranscriber_api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile.dev
+    container_name: mikeintoshtranscriber_api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      HOST: "0.0.0.0"
+      NODE_ENV: development
+      DATABASE_URL: "postgresql://voicetext:voicetext_dev@172.28.0.10:5432/voicetext?schema=public"
+      REDIS_URL: "redis://172.28.0.11:6379"
+      JWT_SECRET: "voicetext-dev-jwt-secret-change-in-production-2026"
+      JWT_ACCESS_EXPIRY: "15m"
+      JWT_REFRESH_EXPIRY: "7d"
+      CORS_ORIGIN: "http://172.28.0.30:8080,http://localhost:8080"
+    volumes:
+      - ./packages/api/src:/app/packages/api/src
+      - ./packages/api/prisma:/app/packages/api/prisma
+    depends_on:
+      mikeintoshtranscriber_db:
+        condition: service_healthy
+      mikeintoshtranscriber_redis:
+        condition: service_healthy
+    networks:
+      mikeintoshtranscribernet:
+        ipv4_address: 172.28.0.20
+
+  mikeintoshtranscriber_web:
+    image: nginx:alpine
+    container_name: mikeintoshtranscriber_web
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./apps/web:/usr/share/nginx/html:ro
+      - ./apps/web/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - mikeintoshtranscriber_api
+    networks:
+      mikeintoshtranscribernet:
+        ipv4_address: 172.28.0.30
+
+networks:
+  mikeintoshtranscribernet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
 
 volumes:
   postgres_data:
