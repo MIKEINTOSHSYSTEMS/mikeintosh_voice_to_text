@@ -41,7 +41,7 @@ const SpeechManager = (function () {
     recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = 'am-ET';
+    recognition.lang = config.language || 'am-ET';
 
     recognition.onstart = handleRecognitionStart;
     recognition.onresult = handleRecognitionResult;
@@ -227,6 +227,12 @@ const SpeechManager = (function () {
     finalTranscript = text;
   }
 
+  function setLanguage(lang) {
+    if (recognition && typeof lang === 'string' && lang.length > 0) {
+      recognition.lang = lang;
+    }
+  }
+
   function updateTranscript(newText, isAppend) {
     if (callbacks.onTranscriptUpdate) {
       callbacks.onTranscriptUpdate(newText, isAppend);
@@ -263,6 +269,7 @@ const SpeechManager = (function () {
     destroy,
     getState,
     setFinalTranscript,
+    setLanguage,
     updateTranscript,
     checkMicrophonePermission,
   };

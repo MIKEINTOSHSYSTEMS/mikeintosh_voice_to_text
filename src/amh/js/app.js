@@ -471,6 +471,9 @@
       if (key === 'theme') {
         ThemeManager.setTheme(newValue);
       }
+      if (key === 'speechLanguage') {
+        SpeechManager.setLanguage(newValue);
+      }
     });
   }
 
@@ -578,6 +581,7 @@
       elements: {
         recordingTimer: elements.recordingTimer,
       },
+      language: SettingsUI.getSpeechLanguage(),
       callbacks: {
         onRecordingStart: () => {
           setRecordingState(true);

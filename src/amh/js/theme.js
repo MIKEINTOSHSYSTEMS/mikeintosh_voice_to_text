@@ -38,9 +38,17 @@ const ThemeManager = (function () {
     return currentTheme;
   }
 
+  function setTheme(theme) {
+    if (theme === 'dark' || theme === 'light') {
+      applyTheme(theme);
+    }
+    return currentTheme;
+  }
+
   return {
     init,
     toggle,
+    setTheme,
     getCurrent,
   };
 })();
