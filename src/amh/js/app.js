@@ -735,6 +735,7 @@
     });
 
     elements.uploadClear.addEventListener('click', function () {
+      TranscriptionEngine.stop();
       AudioUploadManager.clear();
       AudioPlayerManager.unload();
     });
