@@ -44,6 +44,17 @@
     wordCountValue: document.getElementById('word-count-value'),
     readingTime: document.getElementById('reading-time'),
     speechDuration: document.getElementById('speech-duration'),
+    uploadDropZone: document.getElementById('upload-drop-zone'),
+    uploadFileInput: document.getElementById('upload-file-input'),
+    uploadStatus: document.getElementById('upload-status'),
+    uploadStatusIcon: document.getElementById('upload-status-icon'),
+    uploadStatusText: document.getElementById('upload-status-text'),
+    uploadFileInfo: document.getElementById('upload-file-info'),
+    uploadFileName: document.getElementById('upload-file-name'),
+    uploadFormat: document.getElementById('upload-format'),
+    uploadSize: document.getElementById('upload-size'),
+    uploadDuration: document.getElementById('upload-duration'),
+    uploadClear: document.getElementById('upload-clear'),
   };
 
   let transcriptTitle = 'Untitled Transcript';
@@ -702,6 +713,52 @@
     initApp();
 
     PwaManager.init();
+
+    AudioUploadManager.init({
+      elements: {
+        dropZone: elements.uploadDropZone,
+        fileInput: elements.uploadFileInput,
+      },
+      callbacks: {
+        onStateChange: function (state) {
+          if (state === 'loading') {
+            elements.uploadStatus.hidden = false;
+            elements.uploadStatus.setAttribute('data-state', 'loading');
+            elements.uploadStatusIcon.textContent = '\u23F3';
+            elements.uploadStatusText.textContent = 'Loading audio file...';
+            elements.uploadFileInfo.hidden = true;
+          } else if (state === 'error') {
+            elements.uploadStatus.hidden = false;
+            elements.uploadStatus.setAttribute('data-state', 'error');
+            elements.uploadStatusIcon.textContent = '\u26A0\uFE0F';
+            elements.uploadStatusText.textContent = '';
+            elements.uploadFileInfo.hidden = true;
+          } else if (state === 'idle') {
+            elements.uploadStatus.hidden = true;
+            elements.uploadFileInfo.hidden = true;
+          }
+        },
+        onFileLoaded: function (data) {
+          elements.uploadStatus.hidden = true;
+          elements.uploadFileInfo.hidden = false;
+          elements.uploadFileName.textContent = data.metadata.name;
+          elements.uploadFormat.textContent = data.metadata.format;
+          elements.uploadSize.textContent = data.metadata.sizeFormatted;
+          elements.uploadDuration.textContent = data.metadata.durationFormatted;
+        },
+        onError: function (message) {
+          elements.uploadStatus.hidden = false;
+          elements.uploadStatus.setAttribute('data-state', 'error');
+          elements.uploadStatusIcon.textContent = '\u26A0\uFE0F';
+          elements.uploadStatusText.textContent = message;
+          elements.uploadFileInfo.hidden = true;
+        },
+      },
+    });
+
+    elements.uploadClear.addEventListener('click', function () {
+      AudioUploadManager.clear();
+    });
   }
 
   // Start the app when DOM is ready

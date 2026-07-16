@@ -136,6 +136,37 @@
         </div>
       </section>
 
+      <section class="glass-card upload-section" aria-label="Audio Upload">
+        <div class="upload-header">
+          <h2 class="upload-title">Upload Audio Recording</h2>
+        </div>
+        <div class="upload-area" id="upload-drop-zone" role="button" tabindex="0" aria-label="Upload audio file. Click or drag and drop.">
+          <input type="file" id="upload-file-input" class="upload-file-input" accept=".mp3,.wav,.m4a,.ogg,.webm,audio/*" aria-hidden="true">
+          <div class="upload-area-content">
+            <span class="upload-icon" aria-hidden="true">&#127908;</span>
+            <p class="upload-text">Drag your audio file here</p>
+            <p class="upload-or">or</p>
+            <button type="button" class="btn btn-secondary upload-browse-btn" tabindex="-1">Browse Files</button>
+            <p class="upload-hint">MP3, WAV, M4A, OGG, WEBM (max 100 MB)</p>
+          </div>
+        </div>
+        <div class="upload-status" id="upload-status" hidden>
+          <span class="upload-status-icon" id="upload-status-icon" aria-hidden="true"></span>
+          <span class="upload-status-text" id="upload-status-text"></span>
+        </div>
+        <div class="upload-file-info" id="upload-file-info" hidden>
+          <div class="upload-file-row">
+            <span class="upload-file-name" id="upload-file-name"></span>
+            <button type="button" id="upload-clear" class="btn btn-sm btn-danger" aria-label="Remove uploaded file">Remove</button>
+          </div>
+          <div class="upload-file-details">
+            <span class="upload-detail"><span class="upload-detail-label">Format</span> <span class="upload-detail-value" id="upload-format"></span></span>
+            <span class="upload-detail"><span class="upload-detail-label">Size</span> <span class="upload-detail-value" id="upload-size"></span></span>
+            <span class="upload-detail"><span class="upload-detail-label">Duration</span> <span class="upload-detail-value" id="upload-duration"></span></span>
+          </div>
+        </div>
+      </section>
+
       <section class="glass-card transcription-output" aria-label="Transcription Workspace">
         <div class="workspace-header">
           <div class="workspace-title-row">
@@ -321,6 +352,7 @@
   <script src="js/stats.js"></script>
   <script src="js/history.js"></script>
   <script src="js/search.js"></script>
+  <script src="js/audio-upload.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/speech.js"></script>
   <script src="js/history-ui.js"></script>
