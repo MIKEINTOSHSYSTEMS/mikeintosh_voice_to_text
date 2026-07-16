@@ -356,6 +356,8 @@
       AudioManager.stop();
     }
 
+    saveCurrentToHistory();
+
     hideAudioVisualizer();
     updateAudioLevel(0);
 
@@ -384,6 +386,8 @@
       AudioManager.stop();
     }
 
+    saveCurrentToHistory();
+
     hideAudioVisualizer();
     updateAudioLevel(0);
 
@@ -406,13 +410,81 @@
   }
 
   // ============================================
+  // HISTORY & SETTINGS INTEGRATION
+  // ============================================
+
+  function openTranscriptFromHistory(id) {
+    HistoryManager.get(id).then(function (result) {
+      if (result.success && result.transcript) {
+        var t = result.transcript;
+        elements.outputTextarea.value = t.content || '';
+        elements.transcriptTitle.value = t.title || 'Untitled Transcript';
+        transcriptTitle = t.title || 'Untitled Transcript';
+        SpeechManager.setFinalTranscript(t.content || '');
+        SearchManager.clear();
+        updateWordCount();
+        updateButtonStates();
+        HistoryManager.setCurrent(id);
+        HistoryUI.setCurrentId(id);
+        StorageManager.saveTranscription(t.content || '');
+        StorageManager.saveTitle(t.title || 'Untitled Transcript');
+        showToast('Opened: ' + (t.title || 'Untitled'));
+      }
+    });
+  }
+
+  function saveCurrentToHistory() {
+    var text = elements.outputTextarea.value;
+    if (!text.trim()) return;
+
+    var title = elements.transcriptTitle.value.trim() || 'Untitled Transcript';
+    var duration = SpeechManager.getState().totalSpeakingDuration;
+    var existingId = HistoryManager.getCurrentId();
+
+    if (existingId) {
+      HistoryManager.update(existingId, {
+        title: title,
+        content: text,
+        duration: duration,
+      });
+    } else {
+      HistoryManager.create({
+        title: title,
+        content: text,
+        duration: duration,
+      }).then(function (result) {
+        if (result.success && result.transcript) {
+          HistoryManager.setCurrent(result.transcript.id);
+          HistoryUI.setCurrentId(result.transcript.id);
+        }
+      });
+    }
+  }
+
+  function initHistoryAndSettings() {
+    HistoryUI.init({ showToast: showToast });
+    SettingsUI.init({ showToast: showToast });
+
+    HistoryUI.onOpenTranscript(openTranscriptFromHistory);
+
+    SettingsManager.onChange(function (key, newValue) {
+      if (key === 'theme') {
+        ThemeManager.setTheme(newValue);
+      }
+    });
+  }
+
+  // ============================================
   // EVENT LISTENERS
   // ============================================
 
   function bindEvents() {
-    elements.themeToggle.addEventListener('click', () => {
-      const newTheme = ThemeManager.toggle();
-      showToast(`Switched to ${newTheme} mode`);
+    elements.themeToggle.addEventListener('click', function () {
+      var newTheme = ThemeManager.toggle();
+      if (typeof SettingsManager !== 'undefined') {
+        SettingsManager.set('theme', newTheme);
+      }
+      showToast('Switched to ' + newTheme + ' mode');
     });
 
     elements.micButton.addEventListener('click', () => {
@@ -432,8 +504,10 @@
     elements.newTranscriptionButton.addEventListener('click', newTranscription);
     elements.resetButton.addEventListener('click', resetTranscription);
 
-    elements.outputTextarea.addEventListener('input', () => {
-      saveTranscription();
+    elements.outputTextarea.addEventListener('input', function () {
+      if (typeof SettingsUI !== 'undefined' && SettingsUI.isAutoSave()) {
+        saveTranscription();
+      }
       updateWordCount();
     });
 
@@ -599,6 +673,7 @@
     });
 
     bindEvents();
+    initHistoryAndSettings();
     loadTranscription();
     loadTitle();
     updateWordCount();
@@ -612,6 +687,7 @@
 
     try {
       await StorageManager.initDB();
+      SettingsManager.init();
       if (StorageManager.needsMigration()) {
         await StorageManager.migrate();
       }
