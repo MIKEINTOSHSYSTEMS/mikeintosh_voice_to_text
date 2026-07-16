@@ -256,7 +256,7 @@ var AIService = (function () {
       if (error.message && error.message.includes('API key')) {
         return error.message;
       }
-      return 'AI service error: ' + (error.message || 'Unknown error');
+      return 'AI service error. Please try again later.';
     }
 
     function isRetryable(error) {

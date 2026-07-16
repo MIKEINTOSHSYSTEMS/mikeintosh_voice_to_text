@@ -2,6 +2,7 @@
   "name": "Amharic Voice-to-Text Transcription",
   "short_name": "VoiceText",
   "description": "Professional Amharic speech recognition and transcription application",
+  "version": "1.0.0",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait-primary",
