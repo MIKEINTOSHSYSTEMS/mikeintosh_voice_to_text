@@ -700,6 +700,12 @@
     }
 
     initApp();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js').catch(function (err) {
+        console.warn('Service worker registration failed:', err);
+      });
+    }
   }
 
   // Start the app when DOM is ready
