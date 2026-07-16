@@ -701,65 +701,7 @@
 
     initApp();
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js').then(function (reg) {
-        if (reg.waiting) {
-          showUpdateBanner(reg.waiting);
-        }
-        reg.addEventListener('updatefound', function () {
-          var newWorker = reg.installing;
-          if (newWorker) {
-            newWorker.addEventListener('statechange', function () {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                showUpdateBanner(newWorker);
-              }
-            });
-          }
-        });
-      }).catch(function (err) {
-        console.warn('Service worker registration failed:', err);
-      });
-
-      navigator.serviceWorker.addEventListener('controllerchange', function () {
-        window.location.reload();
-      });
-    }
-
-    var offlineBanner = document.getElementById('offline-banner');
-    var updateBanner = document.getElementById('update-banner');
-    var updateRefresh = document.getElementById('update-refresh');
-    var waitingWorker = null;
-
-    function showUpdateBanner(worker) {
-      waitingWorker = worker;
-      if (updateBanner) updateBanner.hidden = false;
-    }
-
-    function hideUpdateBanner() {
-      waitingWorker = null;
-      if (updateBanner) updateBanner.hidden = true;
-    }
-
-    if (updateRefresh) {
-      updateRefresh.addEventListener('click', function () {
-        if (waitingWorker) {
-          waitingWorker.postMessage({ type: 'skipWaiting' });
-        }
-        hideUpdateBanner();
-      });
-    }
-
-    window.addEventListener('online', function () {
-      if (offlineBanner) offlineBanner.hidden = true;
-    });
-
-    window.addEventListener('offline', function () {
-      if (offlineBanner) offlineBanner.hidden = false;
-    });
-
-    if (!navigator.onLine) {
-      if (offlineBanner) offlineBanner.hidden = false;
-    }
+    PwaManager.init();
   }
 
   // Start the app when DOM is ready
