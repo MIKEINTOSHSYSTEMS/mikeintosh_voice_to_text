@@ -1,6 +1,9 @@
 /**
  * Transcription Engine Module
- * Unified abstraction for live mic and file-based transcription
+ * Unified abstraction for mic and file-based transcription
+ *
+ * Mic mode: delegates directly to SpeechManager
+ * File mode: EXPERIMENTAL — plays audio through speakers, captured via mic
  */
 
 const TranscriptionEngine = (function () {
@@ -9,18 +12,29 @@ const TranscriptionEngine = (function () {
   var mode = null;
   var isRunning = false;
   var callbacks = {};
+  var speechRef = null;
+  var playerRef = null;
+  var trailingTimer = null;
+  var fileEndedHandler = null;
 
   function init(config) {
     callbacks = config.callbacks || {};
+    speechRef = config.speechManager || null;
+    playerRef = config.audioPlayer || null;
   }
 
-  function startTranscription(transcriptMode, audioPlayer) {
+  function startTranscription(transcriptMode) {
     if (isRunning) return;
+
+    if (!speechRef) {
+      if (callbacks.onError) callbacks.onError('Speech engine not initialized.');
+      return;
+    }
 
     mode = transcriptMode;
 
     if (mode === 'file') {
-      startFileTranscription(audioPlayer);
+      startFileTranscription();
     } else {
       startMicTranscription();
     }
@@ -28,27 +42,29 @@ const TranscriptionEngine = (function () {
 
   function startMicTranscription() {
     isRunning = true;
-    SpeechManager.toggle();
+    speechRef.toggle();
   }
 
-  function startFileTranscription(audioPlayer) {
-    if (!audioPlayer || audioPlayer.getState() === 'idle') {
+  function startFileTranscription() {
+    if (!playerRef || playerRef.getState() === 'idle') {
       if (callbacks.onError) {
         callbacks.onError('No audio loaded. Upload a file first.');
       }
+      mode = null;
       return;
     }
 
     isRunning = true;
 
-    audioPlayer.play();
+    playerRef.play();
 
-    var audio = audioPlayer.getAudio();
+    var audio = playerRef.getAudio();
     if (audio) {
-      audio.addEventListener('ended', handleFilePlaybackEnded);
+      fileEndedHandler = handleFilePlaybackEnded;
+      audio.addEventListener('ended', fileEndedHandler);
     }
 
-    SpeechManager.toggle();
+    speechRef.toggle();
 
     if (callbacks.onFileTranscriptionStart) {
       callbacks.onFileTranscriptionStart();
@@ -56,7 +72,8 @@ const TranscriptionEngine = (function () {
   }
 
   function handleFilePlaybackEnded() {
-    setTimeout(function () {
+    trailingTimer = setTimeout(function () {
+      trailingTimer = null;
       if (isRunning && mode === 'file') {
         stopTranscription();
       }
@@ -68,18 +85,22 @@ const TranscriptionEngine = (function () {
 
     isRunning = false;
 
-    if (mode === 'file') {
-      var audio = AudioPlayerManager.getAudio();
-      if (audio) {
-        audio.removeEventListener('ended', handleFilePlaybackEnded);
-        audio.pause();
-        audio.currentTime = 0;
-      }
-      AudioPlayerManager.stop();
+    if (trailingTimer) {
+      clearTimeout(trailingTimer);
+      trailingTimer = null;
     }
 
-    if (SpeechManager.getState().isRecording) {
-      SpeechManager.toggle();
+    if (mode === 'file') {
+      var audio = playerRef ? playerRef.getAudio() : null;
+      if (audio && fileEndedHandler) {
+        audio.removeEventListener('ended', fileEndedHandler);
+      }
+      fileEndedHandler = null;
+      if (playerRef) playerRef.stop();
+    }
+
+    if (speechRef && speechRef.getState().isRecording) {
+      speechRef.toggle();
     }
 
     if (callbacks.onTranscriptionStop) {
@@ -89,18 +110,24 @@ const TranscriptionEngine = (function () {
     mode = null;
   }
 
-  function getMode() {
-    return mode;
+  function resetOnError() {
+    isRunning = false;
+    mode = null;
+    if (trailingTimer) {
+      clearTimeout(trailingTimer);
+      trailingTimer = null;
+    }
+    fileEndedHandler = null;
   }
 
-  function getIsRunning() {
-    return isRunning;
-  }
+  function getMode() { return mode; }
+  function getIsRunning() { return isRunning; }
 
   return {
     init: init,
     start: startTranscription,
     stop: stopTranscription,
+    resetOnError: resetOnError,
     getMode: getMode,
     getIsRunning: getIsRunning,
   };

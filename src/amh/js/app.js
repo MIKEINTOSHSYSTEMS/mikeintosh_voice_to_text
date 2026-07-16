@@ -55,6 +55,7 @@
     uploadSize: document.getElementById('upload-size'),
     uploadDuration: document.getElementById('upload-duration'),
     uploadClear: document.getElementById('upload-clear'),
+    uploadExperimental: document.getElementById('upload-experimental'),
     playerContainer: document.getElementById('player-container'),
     playerFileName: document.getElementById('player-file-name'),
     playerPlayPause: document.getElementById('player-play-pause'),
@@ -515,11 +516,10 @@
     elements.micButton.addEventListener('click', () => {
       if (TranscriptionEngine.getIsRunning()) {
         TranscriptionEngine.stop();
-        SpeechManager.stop();
         setRecordingState(false);
         setStatus('status-ready');
       } else if (AudioUploadManager.getState() === 'loaded') {
-        TranscriptionEngine.start('file', AudioPlayerManager);
+        TranscriptionEngine.start('file');
         setRecordingState(true);
         setStatus('status-listening');
       } else {
@@ -737,6 +737,7 @@
         onFileLoaded: function (data) {
           elements.uploadStatus.hidden = true;
           elements.uploadFileInfo.hidden = false;
+          elements.uploadExperimental.hidden = false;
           elements.uploadFileName.textContent = data.metadata.name;
           elements.uploadFormat.textContent = data.metadata.format;
           elements.uploadSize.textContent = data.metadata.sizeFormatted;
@@ -776,6 +777,8 @@
     });
 
     TranscriptionEngine.init({
+      speechManager: SpeechManager,
+      audioPlayer: AudioPlayerManager,
       callbacks: {
         onError: function (msg) { showToast(msg); },
         onFileTranscriptionStart: function () { setRecordingState(true); setStatus('status-listening'); },

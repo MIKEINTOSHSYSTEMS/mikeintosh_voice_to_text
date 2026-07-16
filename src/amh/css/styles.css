@@ -1438,6 +1438,30 @@ body::before {
   border: 1px solid var(--border-light);
 }
 
+.upload-experimental {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-md);
+}
+
+.upload-experimental-icon {
+  font-size: var(--font-size-base);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.upload-experimental-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-warning);
+  margin: 0;
+  line-height: 1.5;
+}
+
 .upload-file-row {
   display: flex;
   align-items: center;
