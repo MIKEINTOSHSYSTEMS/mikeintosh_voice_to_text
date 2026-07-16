@@ -55,6 +55,17 @@
     uploadSize: document.getElementById('upload-size'),
     uploadDuration: document.getElementById('upload-duration'),
     uploadClear: document.getElementById('upload-clear'),
+    playerContainer: document.getElementById('player-container'),
+    playerFileName: document.getElementById('player-file-name'),
+    playerPlayPause: document.getElementById('player-play-pause'),
+    playerStop: document.getElementById('player-stop'),
+    playerProgressBar: document.getElementById('player-progress-bar'),
+    playerProgressFill: document.getElementById('player-progress-fill'),
+    playerCurrentTime: document.getElementById('player-current-time'),
+    playerTotalDuration: document.getElementById('player-total-duration'),
+    playerSpeedSelect: document.getElementById('player-speed-select'),
+    playerMuteBtn: document.getElementById('player-mute-btn'),
+    playerVolumeSlider: document.getElementById('player-volume-slider'),
   };
 
   let transcriptTitle = 'Untitled Transcript';
@@ -721,21 +732,18 @@
       },
       callbacks: {
         onStateChange: function (state) {
-          if (state === 'loading') {
-            elements.uploadStatus.hidden = false;
+          var isError = state === 'error';
+          var isLoading = state === 'loading';
+          var isIdle = state === 'idle';
+          elements.uploadStatus.hidden = isIdle;
+          elements.uploadFileInfo.hidden = !isIdle && !isError ? false : true;
+          if (isLoading) {
             elements.uploadStatus.setAttribute('data-state', 'loading');
             elements.uploadStatusIcon.textContent = '\u23F3';
             elements.uploadStatusText.textContent = 'Loading audio file...';
-            elements.uploadFileInfo.hidden = true;
-          } else if (state === 'error') {
-            elements.uploadStatus.hidden = false;
+          } else if (isError) {
             elements.uploadStatus.setAttribute('data-state', 'error');
             elements.uploadStatusIcon.textContent = '\u26A0\uFE0F';
-            elements.uploadStatusText.textContent = '';
-            elements.uploadFileInfo.hidden = true;
-          } else if (state === 'idle') {
-            elements.uploadStatus.hidden = true;
-            elements.uploadFileInfo.hidden = true;
           }
         },
         onFileLoaded: function (data) {
@@ -745,6 +753,7 @@
           elements.uploadFormat.textContent = data.metadata.format;
           elements.uploadSize.textContent = data.metadata.sizeFormatted;
           elements.uploadDuration.textContent = data.metadata.durationFormatted;
+          AudioPlayerManager.load(data.metadata.objectUrl, data.metadata);
         },
         onError: function (message) {
           elements.uploadStatus.hidden = false;
@@ -758,6 +767,24 @@
 
     elements.uploadClear.addEventListener('click', function () {
       AudioUploadManager.clear();
+      AudioPlayerManager.unload();
+    });
+
+    AudioPlayerManager.init({
+      elements: {
+        playerContainer: elements.playerContainer,
+        fileName: elements.playerFileName,
+        playPauseBtn: elements.playerPlayPause,
+        stopBtn: elements.playerStop,
+        progressBar: elements.playerProgressBar,
+        progressFill: elements.playerProgressFill,
+        currentTime: elements.playerCurrentTime,
+        totalDuration: elements.playerTotalDuration,
+        speedSelect: elements.playerSpeedSelect,
+        muteBtn: elements.playerMuteBtn,
+        volumeSlider: elements.playerVolumeSlider,
+      },
+      callbacks: { onError: function (msg) { showToast(msg); } },
     });
   }
 

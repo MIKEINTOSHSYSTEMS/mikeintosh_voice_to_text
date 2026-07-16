@@ -167,6 +167,42 @@
         </div>
       </section>
 
+      <section class="glass-card audio-player-section" id="player-container" hidden aria-label="Audio Player">
+        <div class="player-header">
+          <span class="player-file-name" id="player-file-name"></span>
+        </div>
+        <div class="player-controls">
+          <button type="button" id="player-stop" class="btn btn-sm btn-secondary" aria-label="Stop">&#9632;</button>
+          <button type="button" id="player-play-pause" class="btn btn-sm btn-primary player-play-btn" aria-label="Play">&#9654;</button>
+        </div>
+        <div class="player-progress-row">
+          <span class="player-time" id="player-current-time">0:00</span>
+          <div class="player-progress-bar" id="player-progress-bar" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="player-progress-track">
+              <div class="player-progress-fill" id="player-progress-fill"></div>
+            </div>
+          </div>
+          <span class="player-time" id="player-total-duration">0:00</span>
+        </div>
+        <div class="player-extras">
+          <div class="player-speed">
+            <label for="player-speed-select" class="player-extra-label">Speed</label>
+            <select id="player-speed-select" class="player-speed-select" aria-label="Playback speed">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="2">2x</option>
+            </select>
+          </div>
+          <div class="player-volume">
+            <button type="button" id="player-mute-btn" class="btn btn-sm btn-secondary" aria-label="Mute">&#128266;</button>
+            <input type="range" id="player-volume-slider" class="player-volume-slider" min="0" max="1" step="0.1" value="1" aria-label="Volume">
+          </div>
+        </div>
+      </section>
+
       <section class="glass-card transcription-output" aria-label="Transcription Workspace">
         <div class="workspace-header">
           <div class="workspace-title-row">
@@ -353,6 +389,7 @@
   <script src="js/history.js"></script>
   <script src="js/search.js"></script>
   <script src="js/audio-upload.js"></script>
+  <script src="js/audio-player.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/speech.js"></script>
   <script src="js/history-ui.js"></script>
