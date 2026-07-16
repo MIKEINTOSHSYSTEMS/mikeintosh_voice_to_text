@@ -26,6 +26,24 @@ const SettingsManager = (function () {
         return v === true || v === false;
       },
     },
+    aiProvider: {
+      default: 'openai',
+      validate: function (v) {
+        return v === 'openai' || v === 'anthropic' || v === 'local';
+      },
+    },
+    aiModel: {
+      default: 'gpt-4o-mini',
+      validate: function (v) {
+        return typeof v === 'string' && v.length > 0 && v.length < 100;
+      },
+    },
+    aiEnabled: {
+      default: false,
+      validate: function (v) {
+        return v === true || v === false;
+      },
+    },
   };
 
   var settings = {};

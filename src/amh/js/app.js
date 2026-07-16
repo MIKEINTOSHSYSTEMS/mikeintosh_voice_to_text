@@ -99,6 +99,16 @@
     return div.innerHTML;
   }
 
+  function debounce(fn, ms) {
+    var timer;
+    return function () {
+      var args = arguments;
+      var ctx = this;
+      clearTimeout(timer);
+      timer = setTimeout(function () { fn.apply(ctx, args); }, ms);
+    };
+  }
+
   function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -298,7 +308,7 @@
 
     const safeText = escapeHTML(text);
     const safeTitle = escapeHTML(transcriptTitle);
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open('', '_blank', 'noopener,noreferrer');
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
@@ -351,7 +361,7 @@
 
     const encodedText = encodeURIComponent(text);
     const url = `https://api.whatsapp.com/send?text=${encodedText}`;
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   function shareOnTwitter() {
@@ -360,7 +370,7 @@
 
     const encodedText = encodeURIComponent(text);
     const url = `https://twitter.com/intent/tweet?text=${encodedText}`;
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   // ============================================
@@ -425,6 +435,8 @@
         StorageManager.saveTitle(t.title || 'Untitled Transcript');
         showToast('Opened: ' + (t.title || 'Untitled'));
       }
+    }).catch(function () {
+      showToast('Failed to load transcript');
     });
   }
 
@@ -452,6 +464,8 @@
           HistoryManager.setCurrent(result.transcript.id);
           HistoryUI.setCurrentId(result.transcript.id);
         }
+      }).catch(function () {
+        showToast('Failed to save to history');
       });
     }
   }
@@ -508,14 +522,20 @@
     elements.newTranscriptionButton.addEventListener('click', newTranscription);
     elements.resetButton.addEventListener('click', resetTranscription);
 
-    elements.outputTextarea.addEventListener('input', function () {
+    var debouncedSave = debounce(function () {
       if (typeof SettingsUI !== 'undefined' && SettingsUI.isAutoSave()) saveTranscription();
-      updateWordCount();
+    }, 300);
+    var debouncedWordCount = debounce(updateWordCount, 150);
+
+    elements.outputTextarea.addEventListener('input', function () {
+      debouncedSave();
+      debouncedWordCount();
     });
 
     elements.transcriptTitle.addEventListener('input', saveTitle);
 
-    elements.searchInput.addEventListener('input', (e) => SearchManager.search(e.target.value));
+    var debouncedSearch = debounce(function (val) { SearchManager.search(val); }, 150);
+    elements.searchInput.addEventListener('input', (e) => debouncedSearch(e.target.value));
     elements.searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); e.shiftKey ? SearchManager.navigate('prev') : SearchManager.navigate('next'); }
       if (e.key === 'Escape') SearchManager.clear();
@@ -542,6 +562,9 @@
 
   function cleanup() {
     SpeechManager.stop();
+    TranscriptionEngine.stop();
+    AudioUploadManager.clear();
+    AudioPlayerManager.unload();
 
     if (typeof AudioManager !== 'undefined') {
       AudioManager.destroy();
@@ -600,15 +623,23 @@
     });
 
     SettingsManager.onChange(function (key, value) {
-      if (key === 'aiProvider' || key === 'aiApiKey' || key === 'aiModel') {
+      if (key === 'aiProvider' || key === 'aiModel') {
         refreshAIServices();
       }
     });
+
+    window.addEventListener('aiApiKeySet', function () { refreshAIServices(); });
+  }
+
+  function setAIApiKey(apiKey) {
+    StorageManager.setSecureSetting('aiApiKey', apiKey);
+    refreshAIServices();
+    window.dispatchEvent(new CustomEvent('aiApiKeySet'));
   }
 
   function refreshAIServices() {
     var provider = SettingsManager.get('aiProvider') || 'openai';
-    var apiKey = SettingsManager.get('aiApiKey') || '';
+    var apiKey = StorageManager.getSecureSetting('aiApiKey') || '';
     var model = SettingsManager.get('aiModel') || 'gpt-4o-mini';
 
     if (!apiKey) {
@@ -715,6 +746,7 @@
   }
 
   async function init() {
+    ErrorHandler.init({ showToast: showToast });
     ThemeManager.init();
 
     try {

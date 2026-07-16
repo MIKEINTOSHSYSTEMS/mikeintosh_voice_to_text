@@ -82,8 +82,13 @@ const SpeechManager = (function () {
     }
   }
 
-  async function handleRecognitionStart() {
+  var transientRetryCount = 0;
+  var MAX_TRANSIENT_RETRIES = 2;
+  var TRANSIENT_ERRORS = ['network', 'aborted'];
+
+  function handleRecognitionStart() {
     isRecording = true;
+    transientRetryCount = 0;
     startRecordingTimer();
     updateRecognitionStatus('listening');
     updateMicIndicator('recording');
@@ -93,7 +98,7 @@ const SpeechManager = (function () {
     }
 
     if (callbacks.onAudioVisualizerStart) {
-      await callbacks.onAudioVisualizerStart();
+      Promise.resolve(callbacks.onAudioVisualizerStart()).catch(function () {});
     }
   }
 
@@ -119,11 +124,20 @@ const SpeechManager = (function () {
   }
 
   function handleRecognitionError(event) {
-    console.error('Speech recognition error:', event.error);
     updateRecognitionStatus('error');
 
     if (callbacks.onError) {
       callbacks.onError(event.error);
+    }
+
+    if (TRANSIENT_ERRORS.indexOf(event.error) !== -1 && transientRetryCount < MAX_TRANSIENT_RETRIES && isRecording) {
+      transientRetryCount++;
+      setTimeout(function () {
+        if (recognition && isRecording) {
+          try { recognition.start(); } catch (e) { ignoreOnEnd = true; }
+        }
+      }, 1000 * transientRetryCount);
+      return;
     }
 
     ignoreOnEnd = true;

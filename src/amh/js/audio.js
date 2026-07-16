@@ -27,12 +27,17 @@ const AudioManager = (function () {
     canvasContext = canvas.getContext('2d');
     onLevelChange = levelCallback;
 
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      audioContext = null;
+    }
+
     isInitialized = true;
   }
 
   async function start() {
     if (!isInitialized) {
-      console.error('AudioManager not initialized. Call init() first.');
       return { success: false, error: 'not_initialized' };
     }
 
@@ -45,7 +50,10 @@ const AudioManager = (function () {
         },
       });
 
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioContext && audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+
       analyser = audioContext.createAnalyser();
       analyser.fftSize = FFT_SIZE;
       analyser.smoothingTimeConstant = SMOOTHING_TIME_CONSTANT;
@@ -55,7 +63,6 @@ const AudioManager = (function () {
 
       return { success: true };
     } catch (error) {
-      console.error('Audio initialization failed:', error);
       cleanup();
       return { success: false, error: error.name };
     }
@@ -80,11 +87,6 @@ const AudioManager = (function () {
     if (mediaStream) {
       mediaStream.getTracks().forEach((track) => track.stop());
       mediaStream = null;
-    }
-
-    if (audioContext && audioContext.state !== 'closed') {
-      audioContext.close().catch(() => {});
-      audioContext = null;
     }
   }
 
@@ -172,6 +174,10 @@ const AudioManager = (function () {
 
   function destroy() {
     stop();
+    if (audioContext && audioContext.state !== 'closed') {
+      audioContext.close().catch(() => {});
+      audioContext = null;
+    }
     isInitialized = false;
     canvas = null;
     canvasContext = null;

@@ -328,31 +328,94 @@ const StorageManager = (function () {
     theme: 'dark',
     speechLanguage: 'am-ET',
     autoSave: true,
+    aiProvider: 'openai',
+    aiModel: 'gpt-4o-mini',
+    aiEnabled: false,
   };
+
+  var SECURE_KEYS = ['aiApiKey'];
+  var SECURE_STORAGE_KEY = 'amvtt_secure';
 
   function loadSettings() {
     try {
       var raw = localStorage.getItem(SETTINGS_KEY);
-      if (raw) {
-        var parsed = JSON.parse(raw);
-        return { success: true, settings: Object.assign({}, defaultSettings, parsed) };
-      }
-      return { success: true, settings: Object.assign({}, defaultSettings) };
+      var parsed = raw ? JSON.parse(raw) : {};
+      var merged = Object.assign({}, defaultSettings, parsed);
+
+      SECURE_KEYS.forEach(function (key) {
+        if (merged[key] !== undefined) delete merged[key];
+      });
+
+      try {
+        var secureRaw = sessionStorage.getItem(SECURE_STORAGE_KEY);
+        if (secureRaw) {
+          var secureParsed = JSON.parse(secureRaw);
+          Object.keys(secureParsed).forEach(function (key) {
+            if (SECURE_KEYS.indexOf(key) !== -1) merged[key] = secureParsed[key];
+          });
+        }
+      } catch (e) { /* sessionStorage unavailable */ }
+
+      return { success: true, settings: merged };
     } catch (error) {
-      console.error('Load settings failed:', error);
+      console.error('Load settings failed');
       return { success: true, settings: Object.assign({}, defaultSettings) };
     }
   }
 
   function saveSettings(settings) {
     try {
-      var merged = Object.assign({}, defaultSettings, settings);
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(merged));
+      var toStore = Object.assign({}, defaultSettings, settings);
+      var secureData = {};
+
+      SECURE_KEYS.forEach(function (key) {
+        if (toStore[key] !== undefined) {
+          secureData[key] = toStore[key];
+          delete toStore[key];
+        }
+      });
+
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(toStore));
+
+      try {
+        var existingRaw = sessionStorage.getItem(SECURE_STORAGE_KEY);
+        var existing = existingRaw ? JSON.parse(existingRaw) : {};
+        Object.assign(existing, secureData);
+        sessionStorage.setItem(SECURE_STORAGE_KEY, JSON.stringify(existing));
+      } catch (e) { /* sessionStorage unavailable */ }
+
       return { success: true };
     } catch (error) {
-      console.error('Save settings failed:', error);
+      console.error('Save settings failed');
       return { success: false, error: error.message };
     }
+  }
+
+  function getSecureSetting(key) {
+    if (SECURE_KEYS.indexOf(key) === -1) return undefined;
+    try {
+      var raw = sessionStorage.getItem(SECURE_STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        return parsed[key];
+      }
+    } catch (e) { return undefined; }
+    return undefined;
+  }
+
+  function setSecureSetting(key, value) {
+    if (SECURE_KEYS.indexOf(key) === -1) return false;
+    try {
+      var raw = sessionStorage.getItem(SECURE_STORAGE_KEY);
+      var parsed = raw ? JSON.parse(raw) : {};
+      parsed[key] = value;
+      sessionStorage.setItem(SECURE_STORAGE_KEY, JSON.stringify(parsed));
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function clearSecureSettings() {
+    try { sessionStorage.removeItem(SECURE_STORAGE_KEY); } catch (e) { /* ignore */ }
   }
 
   function resetSettings() {
@@ -469,6 +532,9 @@ const StorageManager = (function () {
     loadSettings: loadSettings,
     saveSettings: saveSettings,
     resetSettings: resetSettings,
+    getSecureSetting: getSecureSetting,
+    setSecureSetting: setSecureSetting,
+    clearSecureSettings: clearSecureSettings,
 
     // Migration
     needsMigration: needsMigration,

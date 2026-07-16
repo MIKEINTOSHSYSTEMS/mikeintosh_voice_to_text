@@ -386,6 +386,7 @@ body::before {
   transition: transform var(--transition-slow);
   box-shadow: var(--shadow-xl);
   overflow: hidden;
+  will-change: transform;
 }
 
 .history-panel.open {
@@ -576,6 +577,7 @@ body::before {
   opacity: 0;
   pointer-events: none;
   transition: all var(--transition-base);
+  will-change: transform, opacity;
   overflow: hidden;
 }
 
@@ -818,6 +820,7 @@ body::before {
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+  contain: layout style;
 }
 
 .glass-card::before {

@@ -7,7 +7,7 @@
  * Does NOT intercept Web Speech API requests.
  */
 
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const CACHE_NAME = 'amvtt-shell-' + CACHE_VERSION;
 
 var APP_SHELL = [
@@ -17,6 +17,7 @@ var APP_SHELL = [
   './css/styles.css',
   './js/app.js',
   './js/storage.js',
+  './js/error-handler.js',
   './js/settings.js',
   './js/theme.js',
   './js/stats.js',

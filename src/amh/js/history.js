@@ -9,6 +9,13 @@ const HistoryManager = (function () {
 
   var currentTranscriptId = null;
   var cache = [];
+  var MAX_CACHE_SIZE = 50;
+
+  function evictCache() {
+    if (cache.length > MAX_CACHE_SIZE) {
+      cache = cache.slice(0, MAX_CACHE_SIZE);
+    }
+  }
 
   function computeStats(content) {
     var wordCount = 0;
@@ -49,8 +56,11 @@ const HistoryManager = (function () {
         cache.sort(function (a, b) {
           return new Date(b.updatedAt) - new Date(a.updatedAt);
         });
+        evictCache();
       }
       return result;
+    }).catch(function () {
+      return { success: false, error: 'Storage unavailable' };
     });
   }
 
@@ -60,6 +70,8 @@ const HistoryManager = (function () {
         cache = result.transcripts;
       }
       return result;
+    }).catch(function () {
+      return { success: false, error: 'Storage unavailable', transcripts: [] };
     });
   }
 
@@ -81,6 +93,8 @@ const HistoryManager = (function () {
         }
       }
       return result;
+    }).catch(function () {
+      return { success: false, error: 'Storage unavailable' };
     });
   }
 
@@ -100,6 +114,8 @@ const HistoryManager = (function () {
         });
       }
       return result;
+    }).catch(function () {
+      return { success: false, error: 'Storage unavailable' };
     });
   }
 
@@ -114,6 +130,8 @@ const HistoryManager = (function () {
         }
       }
       return result;
+    }).catch(function () {
+      return { success: false, error: 'Storage unavailable' };
     });
   }
 

@@ -68,6 +68,8 @@ const HistoryUI = (function () {
       if (result.success) {
         renderList(result.transcripts);
       }
+    }).catch(function () {
+      if (toastFn) toastFn('Failed to load history');
     });
   }
 
@@ -170,7 +172,11 @@ const HistoryUI = (function () {
         if (toastFn) toastFn('Transcript deleted');
         if (currentId === id) currentId = null;
         refresh();
+      } else {
+        if (toastFn) toastFn('Failed to delete transcript');
       }
+    }).catch(function () {
+      if (toastFn) toastFn('Failed to delete transcript');
     });
   }
 
