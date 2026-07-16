@@ -372,63 +372,40 @@
   // NEW / RESET TRANSCRIPTION
   // ============================================
 
-  function newTranscription() {
+  function clearUploadAndPlayerState() {
+    AudioUploadManager.clear();
+    AudioPlayerManager.unload();
+  }
+
+  function resetTranscriptCore() {
     SpeechManager.stop();
-
-    if (typeof AudioManager !== 'undefined') {
-      AudioManager.stop();
-    }
-
+    TranscriptionEngine.stop();
+    if (typeof AudioManager !== 'undefined') AudioManager.stop();
+    clearUploadAndPlayerState();
     saveCurrentToHistory();
-
     hideAudioVisualizer();
     updateAudioLevel(0);
-
     elements.outputTextarea.value = '';
     StorageManager.removeTranscription();
     elements.micStatus.textContent = 'Press to start recording';
     updateRecognitionStatusDisplay('idle');
-
     transcriptTitle = 'Untitled Transcript';
     StorageManager.removeTitle();
     elements.transcriptTitle.value = 'Untitled Transcript';
-
     SpeechManager.setFinalTranscript('');
     SearchManager.clear();
-
     updateWordCount();
     updateButtonStates();
     setStatus('status-ready');
+  }
+
+  function newTranscription() {
+    resetTranscriptCore();
     showToast('New transcription started');
   }
 
   function resetTranscription() {
-    SpeechManager.stop();
-
-    if (typeof AudioManager !== 'undefined') {
-      AudioManager.stop();
-    }
-
-    saveCurrentToHistory();
-
-    hideAudioVisualizer();
-    updateAudioLevel(0);
-
-    elements.outputTextarea.value = '';
-    StorageManager.removeTranscription();
-    elements.micStatus.textContent = 'Press to start recording';
-    updateRecognitionStatusDisplay('idle');
-
-    transcriptTitle = 'Untitled Transcript';
-    StorageManager.removeTitle();
-    elements.transcriptTitle.value = 'Untitled Transcript';
-
-    SpeechManager.setFinalTranscript('');
-    SearchManager.clear();
-
-    updateWordCount();
-    updateButtonStates();
-    setStatus('status-ready');
+    resetTranscriptCore();
     showToast('Transcription cleared');
   }
 
@@ -553,7 +530,10 @@
     elements.searchClear.addEventListener('click', () => SearchManager.clear());
 
     elements.micButton.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); SpeechManager.toggle(); }
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        elements.micButton.click();
+      }
     });
 
     elements.themeToggle.addEventListener('keydown', (e) => {
