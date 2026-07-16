@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -21,7 +22,7 @@
     <header class="app-header" role="banner">
       <div class="header-content">
         <div class="brand">
-          <img src="assets/logo.png" alt="Mikeintosh" class="logo" width="48" height="48">
+          <img src="assets/mikeintosh_systems_sm.png" alt="Mikeintosh" class="logo" width="48" height="48">
           <h1 class="app-title">Amharic Voice-to-Text</h1>
         </div>
         <p class="app-subtitle">Professional Speech Recognition & Transcription</p>
@@ -155,6 +156,10 @@
           <span class="upload-status-text" id="upload-status-text"></span>
         </div>
         <div class="upload-file-info" id="upload-file-info" hidden>
+          <div class="upload-experimental" id="upload-experimental" hidden>
+            <span class="upload-experimental-icon" aria-hidden="true">&#9888;&#65039;</span>
+            <p class="upload-experimental-text">Experimental file transcription: audio is played through speakers and captured through your microphone. Use headphones for better results.</p>
+          </div>
           <div class="upload-file-row">
             <span class="upload-file-name" id="upload-file-name"></span>
             <button type="button" id="upload-clear" class="btn btn-sm btn-danger" aria-label="Remove uploaded file">Remove</button>
