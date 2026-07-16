@@ -12,6 +12,7 @@ const AudioPlayerManager = (function () {
   var elements = {};
   var animationFrame = null;
   var currentObjectUrl = null;
+  var loadId = 0;
 
   var SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
@@ -45,31 +46,29 @@ const AudioPlayerManager = (function () {
   function load(objectUrl, metadata) {
     unload();
     currentObjectUrl = objectUrl;
+    var thisLoadId = ++loadId;
 
     audio = new Audio();
     audio.preload = 'metadata';
 
     audio.addEventListener('loadedmetadata', function () {
+      if (thisLoadId !== loadId) return;
       updateDuration(audio.duration);
-      if (elements.progressFill) {
-        elements.progressFill.style.width = '0%';
-      }
-      if (elements.currentTime) {
-        elements.currentTime.textContent = '0:00';
-      }
+      if (elements.progressFill) elements.progressFill.style.width = '0%';
+      if (elements.currentTime) elements.currentTime.textContent = '0:00';
       setState('ready');
     });
 
     audio.addEventListener('timeupdate', updateProgress);
     audio.addEventListener('ended', function () {
+      if (thisLoadId !== loadId) return;
       setState('ended');
       cancelAnimationFrame(animationFrame);
     });
     audio.addEventListener('error', function () {
+      if (thisLoadId !== loadId) return;
       setState('error');
-      if (callbacks.onError) {
-        callbacks.onError('Failed to load audio for playback');
-      }
+      if (callbacks.onError) callbacks.onError('Failed to load audio for playback');
     });
 
     audio.src = objectUrl;
@@ -115,6 +114,7 @@ const AudioPlayerManager = (function () {
       startProgressUpdate();
     }).catch(function () {
       setState('ready');
+      if (callbacks.onError) callbacks.onError('Playback failed. Check your audio settings.');
     });
   }
 
@@ -136,6 +136,7 @@ const AudioPlayerManager = (function () {
 
   function seek(e) {
     if (!audio || !elements.progressBar) return;
+    if (!isFinite(audio.duration)) return;
     var rect = elements.progressBar.getBoundingClientRect();
     var fraction = (e.clientX - rect.left) / rect.width;
     fraction = Math.max(0, Math.min(1, fraction));

@@ -25,6 +25,7 @@ const AudioUploadManager = (function () {
   var currentFile = null;
   var currentMetadata = null;
   var callbacks = {};
+  var metadataLoadId = 0;
 
   var elements = {};
 
@@ -103,8 +104,11 @@ const AudioUploadManager = (function () {
 
     setState('loading');
     currentFile = file;
+    currentMetadata = null;
+    var loadId = ++metadataLoadId;
 
     extractMetadata(file, function (err, metadata) {
+      if (loadId !== metadataLoadId) return;
       if (err) {
         setState('error');
         currentFile = null;
@@ -161,10 +165,25 @@ const AudioUploadManager = (function () {
   function extractMetadata(file, callback) {
     var audio = new Audio();
     var objectUrl = URL.createObjectURL(file);
+    var called = false;
+
+    function done(err, metadata) {
+      if (called) return;
+      called = true;
+      clearTimeout(timer);
+      audio.removeAttribute('src');
+      audio.load();
+      if (err) URL.revokeObjectURL(objectUrl);
+      callback(err, metadata);
+    }
+
+    var timer = setTimeout(function () {
+      done(new Error('Metadata extraction timed out'));
+    }, 10000);
 
     audio.addEventListener('loadedmetadata', function () {
       var duration = audio.duration;
-      var metadata = {
+      done(null, {
         name: file.name,
         size: file.size,
         sizeFormatted: formatFileSize(file.size),
@@ -173,13 +192,11 @@ const AudioUploadManager = (function () {
         duration: duration,
         durationFormatted: formatDuration(duration),
         objectUrl: objectUrl,
-      };
-      callback(null, metadata);
+      });
     });
 
     audio.addEventListener('error', function () {
-      URL.revokeObjectURL(objectUrl);
-      callback(new Error('Failed to load audio metadata'));
+      done(new Error('Failed to load audio metadata'));
     });
 
     audio.src = objectUrl;
@@ -211,6 +228,9 @@ const AudioUploadManager = (function () {
   }
 
   function clear() {
+    if (currentMetadata && currentMetadata.objectUrl) {
+      URL.revokeObjectURL(currentMetadata.objectUrl);
+    }
     currentFile = null;
     currentMetadata = null;
     setState('idle');
