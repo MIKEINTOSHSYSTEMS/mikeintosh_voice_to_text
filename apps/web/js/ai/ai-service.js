@@ -127,6 +127,41 @@ var AIService = (function () {
         }
         return { success: false, error: 'Unexpected response format from local AI' };
       }
+    },
+
+    cloud: {
+      name: 'cloud',
+
+      buildRequest: function (config, prompt) {
+        var token = '';
+        try { token = sessionStorage.getItem('vt_token') || ''; } catch (e) { /* ignore */ }
+        return {
+          url: (config.baseUrl || '') + '/api/ai/complete',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            system: prompt.system,
+            user: prompt.user,
+            model: config.model || undefined,
+            temperature: config.temperature || undefined,
+            maxTokens: config.maxTokens || undefined
+          })
+        };
+      },
+
+      parseResponse: function (data) {
+        if (data.success && data.text) {
+          return {
+            success: true,
+            text: data.text.trim(),
+            usage: data.usage || null
+          };
+        }
+        return { success: false, error: (data && data.error && data.error.message) || 'Cloud AI request failed' };
+      }
     }
   };
 
@@ -165,7 +200,7 @@ var AIService = (function () {
         return { success: false, error: 'AI service is busy. Please wait for the current request to finish.' };
       }
 
-      if (!config.apiKey && providerName !== 'local') {
+      if (!config.apiKey && providerName !== 'local' && providerName !== 'cloud') {
         return { success: false, error: 'API key not configured. Please set your API key in Settings.' };
       }
 

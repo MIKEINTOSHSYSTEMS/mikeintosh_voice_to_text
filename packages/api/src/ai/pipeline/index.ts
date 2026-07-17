@@ -1,6 +1,6 @@
 import { getTranscriptionProvider, getLLMProvider } from "../providers/index.js";
 import type { TranscriptionResult } from "../providers/transcription.js";
-import type { SummarizeResult, TranslateResult, AnalyzeResult } from "../providers/llm.js";
+import type { SummarizeResult, TranslateResult, AnalyzeResult, CompleteResult } from "../providers/llm.js";
 
 export interface PipelineResult {
   transcription?: TranscriptionResult;
@@ -38,6 +38,15 @@ export async function analyzeTranscript(
 ): Promise<AnalyzeResult> {
   const provider = getLLMProvider();
   return provider.analyze(text);
+}
+
+export async function completeLLM(
+  system: string,
+  user: string,
+  options?: { model?: string; temperature?: number; maxTokens?: number }
+): Promise<CompleteResult> {
+  const provider = getLLMProvider();
+  return provider.complete(system, user, options);
 }
 
 export async function processTranscript(

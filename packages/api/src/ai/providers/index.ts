@@ -21,4 +21,4 @@ export function getLLMProvider(): LLMProvider {
 }
 
 export type { TranscriptionProvider, TranscriptionResult } from "./transcription.js";
-export type { LLMProvider, SummarizeResult, TranslateResult, AnalyzeResult } from "./llm.js";
+export type { LLMProvider, SummarizeResult, TranslateResult, AnalyzeResult, CompleteResult } from "./llm.js";

@@ -3,6 +3,10 @@
    Dark Teal & Navy Blue Theme
    ============================================ */
 
+[hidden] {
+  display: none !important;
+}
+
 /* CSS Custom Properties - DARK THEME (Default) */
 :root {
   /* Primary Colors - Teal & Navy */
@@ -689,6 +693,230 @@ body::before {
 }
 
 /* ============================================
+   AUTH BUTTON (Header)
+   ============================================ */
+
+.auth-button {
+  position: absolute;
+  top: var(--space-4);
+  right: calc(var(--space-4) + 64px);
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px 12px 3px 6px;
+  background: var(--bg-glass);
+  border: var(--glass-border);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  font-family: inherit;
+}
+
+.auth-button:hover {
+  background: var(--bg-glass-hover);
+  transform: scale(1.05);
+}
+
+.auth-button-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.auth-button.logged-in {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.auth-button.logged-in .auth-button-icon {
+  font-size: 14px;
+}
+
+.auth-button.logged-in .auth-button-text {
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-accent);
+}
+
+/* ============================================
+   AUTH MODAL
+   ============================================ */
+
+.auth-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  width: 400px;
+  max-width: 90vw;
+  max-height: 85vh;
+  background: var(--bg-secondary);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-2xl);
+  z-index: calc(var(--z-modal) + 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl), var(--shadow-glow);
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--transition-base);
+  will-change: transform, opacity;
+  overflow: hidden;
+}
+
+.auth-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.auth-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6) var(--space-6);
+}
+
+.auth-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-2) 0;
+  text-align: center;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.auth-label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.auth-input {
+  background: var(--bg-glass);
+  border: var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.auth-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.auth-input:hover {
+  border-color: var(--border-medium);
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--border-glow);
+}
+
+.auth-error {
+  background: var(--color-danger-light);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+  text-align: center;
+}
+
+.auth-submit-btn {
+  width: 100%;
+  justify-content: center;
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--font-size-sm);
+}
+
+.auth-submit-btn.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.auth-switch {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.auth-link {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  font-family: inherit;
+  padding: 0;
+  transition: color var(--transition-fast);
+}
+
+.auth-link:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+.auth-logged-in {
+  align-items: center;
+  padding-top: var(--space-8);
+}
+
+.auth-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.auth-user-avatar {
+  font-size: 48px;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.auth-user-email {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .auth-button {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="light"] .auth-button:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="light"] .auth-button.logged-in {
+  background: rgba(13, 148, 136, 0.1);
+}
+
+/* ============================================
    TOGGLE SWITCH
    ============================================ */
 
@@ -1294,6 +1522,18 @@ body::before {
   border-color: var(--border-medium);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: white;
+  border: 1px solid var(--color-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-primary-hover), #0F766E);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px var(--color-primary-glow);
 }
 
 .btn-social {
@@ -2106,6 +2346,20 @@ body::before {
   .theme-toggle {
     top: var(--space-3);
     right: var(--space-3);
+  }
+
+  .auth-button {
+    top: var(--space-3);
+    right: calc(var(--space-3) + 64px);
+    padding: 3px 8px 3px 4px;
+  }
+
+  .auth-button-text {
+    display: none;
+  }
+
+  .auth-modal {
+    width: calc(100vw - 2rem);
   }
 
   .dashboard-header-actions .btn-text {

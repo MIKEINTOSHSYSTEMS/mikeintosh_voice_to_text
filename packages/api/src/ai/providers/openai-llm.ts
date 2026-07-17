@@ -5,6 +5,7 @@ import type {
   SummarizeResult,
   TranslateResult,
   AnalyzeResult,
+  CompleteResult,
 } from "./llm.js";
 
 export class OpenAILLMProvider implements LLMProvider {
@@ -101,5 +102,32 @@ Respond in JSON format: { "sentiment": "string", "sentimentScore": number, "keyT
       wordCount: result.wordCount || text.split(/\s+/).length,
       readingTimeMinutes: result.readingTimeMinutes || 0,
     };
+  }
+
+  async complete(
+    system: string,
+    user: string,
+    options?: { model?: string; temperature?: number; maxTokens?: number }
+  ): Promise<CompleteResult> {
+    const response = await this.client.chat.completions.create({
+      model: options?.model || this.model,
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+      temperature: options?.temperature ?? 0.3,
+      max_tokens: options?.maxTokens ?? 2048,
+    });
+
+    const text = response.choices[0]?.message?.content || "";
+    const usage = response.usage
+      ? {
+          promptTokens: response.usage.prompt_tokens,
+          completionTokens: response.usage.completion_tokens,
+          totalTokens: response.usage.total_tokens,
+        }
+      : null;
+
+    return { text, usage };
   }
 }

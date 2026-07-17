@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import { summarizeTranscript, translateTranscript, analyzeTranscript } from "../ai/pipeline/index.js";
+import { summarizeTranscript, translateTranscript, analyzeTranscript, completeLLM } from "../ai/pipeline/index.js";
 import { addJob } from "./queue.service.js";
 import { NotFoundError, ForbiddenError, ValidationError } from "../lib/errors.js";
 
@@ -87,6 +87,13 @@ export async function incrementUsage(userId: string, type: "transcription_minute
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
 
+  const fieldMap: Record<string, string> = {
+    transcription_minutes: "transcriptionMinutes",
+    ai_requests: "aiRequests",
+    storage_bytes: "storageBytes",
+  };
+  const field = fieldMap[type] || type;
+
   await prisma.usage.upsert({
     where: { userId },
     create: {
@@ -98,7 +105,7 @@ export async function incrementUsage(userId: string, type: "transcription_minute
       periodEnd,
     },
     update: {
-      [type]: { increment: amount },
+      [field]: { increment: amount },
       periodEnd,
     },
   });
@@ -141,4 +148,15 @@ export async function analyze(userId: string, transcriptId: string) {
 
   const result = await analyzeTranscript(transcript.content);
   return result;
+}
+
+export async function complete(
+  userId: string,
+  system: string,
+  user: string,
+  options?: { model?: string; temperature?: number; maxTokens?: number }
+) {
+  await checkQuota(userId, "ai_request");
+  await incrementUsage(userId, "ai_requests");
+  return completeLLM(system, user, options);
 }

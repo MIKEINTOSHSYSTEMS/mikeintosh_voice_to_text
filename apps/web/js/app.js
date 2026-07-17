@@ -641,15 +641,21 @@
     var provider = SettingsManager.get('aiProvider') || 'openai';
     var apiKey = StorageManager.getSecureSetting('aiApiKey') || '';
     var model = SettingsManager.get('aiModel') || 'gpt-4o-mini';
+    var useCloud = ApiClient.isAuthenticated();
 
-    if (!apiKey) {
+    if (useCloud) {
+      provider = 'cloud';
+    }
+
+    if (!useCloud && !apiKey) {
       AIUI.updateProviderBadge(false);
       AIUI.setButtonsEnabled(false);
       return;
     }
 
     try {
-      var service = AIService.create({ provider: provider, apiKey: apiKey, model: model, timeout: 30000 });
+      var serviceConfig = { provider: provider, apiKey: apiKey, model: model, timeout: 30000 };
+      var service = AIService.create(serviceConfig);
       var summarizerInst = AISummarizer.create({ aiService: service });
       var translatorInst = AITranslator.create({ aiService: service });
       var analyzerInst = AIAnalyzer.create({ aiService: service });
@@ -758,6 +764,15 @@
     } catch (error) {
       console.warn('IndexedDB initialization failed, continuing with localStorage:', error);
     }
+
+    ApiClient.init({
+      onAuthChange: function (isAuthenticated) {
+        refreshAIServices();
+        AuthUI.syncAuthState();
+      }
+    });
+
+    AuthUI.init({ showToast: showToast });
 
     initApp();
 

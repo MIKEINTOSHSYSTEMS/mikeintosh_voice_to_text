@@ -191,4 +191,64 @@ export async function aiRoutes(app: FastifyInstance) {
       return reply.send(result);
     }
   );
+
+  app.post(
+    "/complete",
+    {
+      schema: {
+        tags: ["AI"],
+        summary: "Complete a prompt",
+        description: "Send a system/user prompt pair to the AI model and receive a completion. Used by the frontend cloud provider.",
+        security: [{ bearerAuth: [] }],
+        body: {
+          type: "object",
+          required: ["system", "user"],
+          properties: {
+            system: { type: "string", minLength: 1 },
+            user: { type: "string", minLength: 1 },
+            model: { type: "string" },
+            temperature: { type: "number", minimum: 0, maximum: 2 },
+            maxTokens: { type: "integer", minimum: 1, maximum: 16384 },
+          },
+        },
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              success: { type: "boolean" },
+              text: { type: "string" },
+              usage: {
+                type: "object",
+                nullable: true,
+                properties: {
+                  promptTokens: { type: "integer" },
+                  completionTokens: { type: "integer" },
+                  totalTokens: { type: "integer" },
+                },
+              },
+            },
+          },
+          401: errorSchema,
+          422: errorSchema,
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const authUser = (request as any).authUser as { id: string };
+      const { system, user, model, temperature, maxTokens } = request.body as {
+        system: string;
+        user: string;
+        model?: string;
+        temperature?: number;
+        maxTokens?: number;
+      };
+
+      if (!system || !user) {
+        throw new ValidationError({ formErrors: ["system and user fields are required"] });
+      }
+
+      const result = await aiService.complete(authUser.id, system, user, { model, temperature, maxTokens });
+      return reply.send({ success: true, text: result.text, usage: result.usage });
+    }
+  );
 }

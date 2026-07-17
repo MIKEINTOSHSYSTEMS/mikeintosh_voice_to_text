@@ -20,8 +20,14 @@ export interface AnalyzeResult {
   readingTimeMinutes: number;
 }
 
+export interface CompleteResult {
+  text: string;
+  usage?: { promptTokens: number; completionTokens: number; totalTokens: number } | null;
+}
+
 export interface LLMProvider {
   summarize(text: string, options?: { maxLength?: number }): Promise<SummarizeResult>;
   translate(text: string, targetLanguage: string): Promise<TranslateResult>;
   analyze(text: string): Promise<AnalyzeResult>;
+  complete(system: string, user: string, options?: { model?: string; temperature?: number; maxTokens?: number }): Promise<CompleteResult>;
 }
