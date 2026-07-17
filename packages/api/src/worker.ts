@@ -6,6 +6,7 @@ import { prisma } from "./lib/prisma.js";
 import { transcribeAudio } from "./ai/pipeline/index.js";
 import { getAudioBuffer } from "./services/storage.service.js";
 import { incrementUsage } from "./services/ai.service.js";
+import { publishJobProgress } from "./services/pubsub.service.js";
 
 loadConfig();
 
@@ -26,16 +27,35 @@ interface JobData {
   data: Record<string, unknown>;
 }
 
-async function processTranscription(jobData: JobData) {
+function emitProgress(jobId: string, status: string, progress: number, message: string, extra?: { result?: unknown; error?: string }) {
+  publishJobProgress({
+    jobId,
+    status,
+    progress,
+    message,
+    result: extra?.result,
+    error: extra?.error,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+async function processTranscription(jobId: string, jobData: JobData) {
   const { userId, audioId, data } = jobData;
 
   const audio = await prisma.audio.findUnique({ where: { id: audioId! } });
   if (!audio || !audio.s3Key) throw new Error("Audio file not found or missing S3 key");
 
+  emitProgress(jobId, "active", 30, "Downloading audio from storage...");
+
   const audioBuffer = await getAudioBuffer(audio.s3Key);
+
+  emitProgress(jobId, "active", 50, "Transcribing with OpenAI Whisper...");
+
   const result = await transcribeAudio(audioBuffer, {
     language: (data.language as string) || "am",
   });
+
+  emitProgress(jobId, "active", 80, "Saving transcript...");
 
   const transcript = await prisma.transcript.create({
     data: {
@@ -91,11 +111,13 @@ async function processor(jobData: JobData) {
     });
   }
 
+  emitProgress(job.id, "active", 10, "Job started...");
+
   try {
     let result;
     switch (jobData.type) {
       case "transcription":
-        result = await processTranscription(jobData);
+        result = await processTranscription(job.id, jobData);
         break;
       default:
         throw new Error(`Unsupported job type: ${jobData.type}`);
@@ -105,6 +127,8 @@ async function processor(jobData: JobData) {
       where: { id: job.id },
       data: { status: "completed", progress: 100, result, completedAt: new Date() },
     });
+
+    emitProgress(job.id, "completed", 100, "Job completed successfully", { result });
 
     return result;
   } catch (error) {
@@ -119,6 +143,7 @@ async function processor(jobData: JobData) {
         data: { status: "failed" },
       });
     }
+    emitProgress(job.id, "failed", 0, "Job failed", { error: errorMessage });
     throw error;
   }
 }

@@ -155,6 +155,102 @@ var ApiClient = (function () {
     },
 
     getBaseUrl: function () { return _baseUrl; },
-    setBaseUrl: function (url) { _baseUrl = url; }
+    setBaseUrl: function (url) { _baseUrl = url; },
+
+    uploadAudio: function (file) {
+      var formData = new FormData();
+      formData.append('file', file);
+      return fetch(_baseUrl + '/api/audio/upload', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + _token },
+        body: formData
+      }).then(function (response) {
+        if (!response.ok) return _handleError(response);
+        return response.json().then(function (d) { return { success: true, data: d }; });
+      }).catch(function (err) {
+        return { success: false, error: err.message || 'Upload failed' };
+      });
+    },
+
+    listAudio: function (params) {
+      var qs = [];
+      if (params) {
+        if (params.page) qs.push('page=' + params.page);
+        if (params.limit) qs.push('limit=' + params.limit);
+      }
+      var query = qs.length ? '?' + qs.join('&') : '';
+      return _request('GET', '/api/audio' + query);
+    },
+
+    getAudio: function (id) {
+      return _request('GET', '/api/audio/' + id);
+    },
+
+    deleteAudio: function (id) {
+      return _request('DELETE', '/api/audio/' + id);
+    },
+
+    startTranscription: function (id) {
+      return _request('POST', '/api/audio/' + id + '/transcribe', {});
+    },
+
+    getAudioStatus: function (id) {
+      return _request('GET', '/api/audio/' + id + '/status');
+    },
+
+    getJob: function (id) {
+      return _request('GET', '/api/jobs/' + id);
+    },
+
+    listJobs: function (params) {
+      var qs = [];
+      if (params) {
+        if (params.page) qs.push('page=' + params.page);
+        if (params.limit) qs.push('limit=' + params.limit);
+        if (params.status) qs.push('status=' + params.status);
+        if (params.type) qs.push('type=' + params.type);
+      }
+      var query = qs.length ? '?' + qs.join('&') : '';
+      return _request('GET', '/api/jobs' + query);
+    },
+
+    streamJobProgress: function (jobId, callbacks) {
+      var url = _baseUrl + '/api/jobs/' + jobId + '/stream?token=' + encodeURIComponent(_token);
+      var es = new EventSource(url);
+
+      es.onmessage = function (event) {
+        try {
+          var data = JSON.parse(event.data);
+          if (data.type === 'snapshot' && callbacks.onSnapshot) callbacks.onSnapshot(data);
+          else if (data.type === 'done' && callbacks.onDone) callbacks.onDone(data);
+          else if (callbacks.onProgress) callbacks.onProgress(data);
+        } catch (e) { /* ignore parse errors */ }
+      };
+
+      es.onerror = function () {
+        if (callbacks.onError) callbacks.onError('SSE connection error');
+        es.close();
+      };
+
+      return {
+        close: function () { es.close(); }
+      };
+    },
+
+    summarize: function (transcriptId, maxLength) {
+      return _request('POST', '/api/ai/summarize', { transcriptId: transcriptId, maxLength: maxLength });
+    },
+
+    translate: function (transcriptId, targetLanguage) {
+      return _request('POST', '/api/ai/translate', { transcriptId: transcriptId, targetLanguage: targetLanguage });
+    },
+
+    analyze: function (transcriptId) {
+      return _request('POST', '/api/ai/analyze', { transcriptId: transcriptId });
+    },
+
+    getUsage: function () {
+      return _request('GET', '/api/ai/usage');
+    }
   };
 })();

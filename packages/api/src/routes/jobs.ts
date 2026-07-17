@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { authMiddleware } from "../middleware/auth.js";
 import { prisma } from "../lib/prisma.js";
+import { subscribeToJobProgress } from "../services/pubsub.service.js";
 
 const errorSchema = {
   type: "object",
@@ -142,6 +143,96 @@ export async function jobRoutes(app: FastifyInstance) {
       }
 
       return reply.send({ job });
+    }
+  );
+
+  app.get(
+    "/:id/stream",
+    {
+      schema: {
+        tags: ["Jobs"],
+        summary: "Stream job progress",
+        description: "SSE stream for real-time job progress updates. Accepts JWT token via query parameter for EventSource compatibility.",
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: "object",
+          required: ["id"],
+          properties: { id: { type: "string", format: "uuid" } },
+        },
+        querystring: {
+          type: "object",
+          properties: {
+            token: { type: "string", description: "JWT access token (required for SSE since EventSource cannot set headers)" },
+          },
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const authUser = (request as any).authUser as { id: string };
+      const { id } = request.params as { id: string };
+
+      const job = await prisma.job.findUnique({ where: { id } });
+      if (!job) {
+        return reply.status(404).send({ error: { code: "NOT_FOUND", message: "Job not found" } });
+      }
+      if (job.userId !== authUser.id) {
+        return reply.status(403).send({ error: { code: "FORBIDDEN", message: "Access denied" } });
+      }
+
+      reply.raw.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "X-Accel-Buffering": "no",
+      });
+
+      const sendEvent = (data: Record<string, unknown>) => {
+        reply.raw.write(`data: ${JSON.stringify(data)}\n\n`);
+      };
+
+      sendEvent({
+        type: "snapshot",
+        jobId: job.id,
+        status: job.status,
+        progress: job.progress,
+        createdAt: job.createdAt,
+        startedAt: job.startedAt,
+        completedAt: job.completedAt,
+      });
+
+      if (job.status === "completed") {
+        sendEvent({ type: "done", status: "completed", progress: 100 });
+        reply.raw.end();
+        return;
+      }
+
+      if (job.status === "failed") {
+        sendEvent({ type: "done", status: "failed", progress: job.progress, error: job.error });
+        reply.raw.end();
+        return;
+      }
+
+      const unsubscribe = subscribeToJobProgress(id, (event) => {
+        sendEvent(event as unknown as Record<string, unknown>);
+        if (event.status === "completed" || event.status === "failed") {
+          setTimeout(() => {
+            unsubscribe();
+            reply.raw.end();
+          }, 100);
+        }
+      });
+
+      request.raw.on("close", () => {
+        unsubscribe();
+      });
+
+      const keepAlive = setInterval(() => {
+        reply.raw.write(`:keepalive\n\n`);
+      }, 15000);
+
+      request.raw.on("close", () => {
+        clearInterval(keepAlive);
+      });
     }
   );
 }

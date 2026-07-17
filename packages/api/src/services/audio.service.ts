@@ -83,18 +83,29 @@ export async function startTranscription(userId: string, audioId: string) {
     data: { status: "transcribing" },
   });
 
-  const jobId = await addJob({
-    type: "transcription",
-    userId,
-    audioId,
-    data: {
-      s3Key: audio.s3Key,
-      language: audio.language,
-      mimeType: audio.mimeType,
-    },
-  });
+  const [bullJobId, prismaJob] = await Promise.all([
+    addJob({
+      type: "transcription",
+      userId,
+      audioId,
+      data: {
+        s3Key: audio.s3Key,
+        language: audio.language,
+        mimeType: audio.mimeType,
+      },
+    }),
+    prisma.job.create({
+      data: {
+        userId,
+        audioId,
+        type: "transcription",
+        status: "queued",
+        priority: 1,
+      },
+    }),
+  ]);
 
-  return { jobId, audioId };
+  return { jobId: prismaJob.id, audioId };
 }
 
 export async function getAudioStatus(userId: string, audioId: string) {
