@@ -56,6 +56,11 @@ services:
       JWT_ACCESS_EXPIRY: "15m"
       JWT_REFRESH_EXPIRY: "7d"
       CORS_ORIGIN: "http://172.28.0.30:8080,http://localhost:8080"
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      S3_ENDPOINT: "http://172.28.0.12:9000"
+      S3_BUCKET: "voicetext-audio"
+      S3_ACCESS_KEY: "minioadmin"
+      S3_SECRET_KEY: "minioadmin"
     volumes:
       - ./packages/api/src:/app/packages/api/src
       - ./packages/api/prisma:/app/packages/api/prisma
@@ -67,6 +72,52 @@ services:
     networks:
       mikeintoshtranscribernet:
         ipv4_address: 172.28.0.20
+
+  mikeintoshtranscriber_worker:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile.dev
+    container_name: mikeintoshtranscriber_worker
+    restart: unless-stopped
+    command: ["pnpm", "dev:worker"]
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: "postgresql://voicetext:voicetext_dev@172.28.0.10:5432/voicetext?schema=public"
+      REDIS_URL: "redis://172.28.0.11:6379"
+      JWT_SECRET: "voicetext-dev-jwt-secret-change-in-production-2026"
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      S3_ENDPOINT: "http://172.28.0.12:9000"
+      S3_BUCKET: "voicetext-audio"
+      S3_ACCESS_KEY: "minioadmin"
+      S3_SECRET_KEY: "minioadmin"
+    volumes:
+      - ./packages/api/src:/app/packages/api/src
+      - ./packages/api/prisma:/app/packages/api/prisma
+    depends_on:
+      mikeintoshtranscriber_db:
+        condition: service_healthy
+      mikeintoshtranscriber_redis:
+        condition: service_healthy
+    networks:
+      mikeintoshtranscribernet:
+        ipv4_address: 172.28.0.21
+
+  mikeintoshtranscriber_minio:
+    image: minio/minio:latest
+    container_name: mikeintoshtranscriber_minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      mikeintoshtranscribernet:
+        ipv4_address: 172.28.0.12
 
   mikeintoshtranscriber_web:
     image: nginx:alpine
@@ -93,3 +144,4 @@ networks:
 volumes:
   postgres_data:
   redis_data:
+  minio_data:

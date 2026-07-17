@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
+import multipart from "@fastify/multipart";
 import swagger from "@fastify/swagger";
 import scalar from "@scalar/fastify-api-reference";
 import { loadConfig } from "./config.js";
@@ -8,6 +9,10 @@ import { prisma } from "./lib/prisma.js";
 import { authRoutes } from "./routes/auth.js";
 import { transcriptRoutes } from "./routes/transcripts.js";
 import { healthRoutes } from "./routes/health.js";
+import { audioRoutes } from "./routes/audio.js";
+import { aiRoutes } from "./routes/ai.js";
+import { jobRoutes } from "./routes/jobs.js";
+import { ensureBucket } from "./services/storage.service.js";
 import type { AppError } from "./lib/errors.js";
 
 const env = loadConfig();
@@ -43,6 +48,9 @@ await app.register(swagger, {
       { name: "Health", description: "Health check endpoints" },
       { name: "Auth", description: "User authentication" },
       { name: "Transcripts", description: "Transcript CRUD operations" },
+      { name: "Audio", description: "Audio file management" },
+      { name: "AI", description: "AI processing (summarize, translate, analyze)" },
+      { name: "Jobs", description: "Background job tracking" },
     ],
   },
 });
@@ -70,9 +78,18 @@ await app.register(jwt, {
   sign: { expiresIn: env.JWT_ACCESS_EXPIRY },
 });
 
+await app.register(multipart, {
+  limits: {
+    fileSize: env.MAX_UPLOAD_SIZE_MB * 1024 * 1024,
+  },
+});
+
 await app.register(healthRoutes);
 await app.register(authRoutes, { prefix: "/api/auth" });
 await app.register(transcriptRoutes, { prefix: "/api/transcripts" });
+await app.register(audioRoutes, { prefix: "/api/audio" });
+await app.register(aiRoutes, { prefix: "/api/ai" });
+await app.register(jobRoutes, { prefix: "/api/jobs" });
 
 app.setErrorHandler((error: AppError & { statusCode?: number; code?: string; details?: unknown }, _request, reply) => {
   const statusCode = error.statusCode || 500;
@@ -93,6 +110,7 @@ process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
 
 try {
+  await ensureBucket();
   await app.listen({ port: env.PORT, host: env.HOST });
   app.log.info(`VoiceText API running on http://${env.HOST}:${env.PORT}`);
   app.log.info(`API docs at http://${env.HOST}:${env.PORT}/docs`);

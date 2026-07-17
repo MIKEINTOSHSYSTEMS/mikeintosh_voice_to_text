@@ -8,13 +8,17 @@ datasource db {
 }
 
 model User {
-  id           String       @id @default(uuid())
-  email        String       @unique
-  name         String?
-  passwordHash String       @map("password_hash")
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
-  transcripts  Transcript[]
+  id                String         @id @default(uuid())
+  email             String         @unique
+  name              String?
+  passwordHash      String         @map("password_hash")
+  tier              String         @default("free")
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+  transcripts       Transcript[]
+  audioFiles        Audio[]
+  jobs              Job[]
+  usage             Usage?
 
   @@map("users")
 }
@@ -33,10 +37,82 @@ model Transcript {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs  Job[]
 
   @@index([userId])
   @@index([createdAt])
   @@index([updatedAt])
   @@map("transcripts")
+}
+
+model Audio {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  filename     String
+  mimeType     String   @map("mime_type")
+  size         Int
+  duration     Int      @default(0)
+  s3Key        String?  @map("s3_key")
+  s3Bucket     String?  @map("s3_bucket")
+  status       String   @default("uploaded")
+  language     String   @default("am-ET")
+  metadata     Json     @default("{}")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs  Job[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("audio_files")
+}
+
+model Job {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  audioId      String?  @map("audio_id")
+  transcriptId String?  @map("transcript_id")
+  type         String
+  status       String   @default("pending")
+  priority     Int      @default(0)
+  progress     Int      @default(0)
+  result       Json?
+  error        String?
+  attempts     Int      @default(0)
+  maxAttempts  Int      @default(3)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  startedAt    DateTime? @map("started_at")
+  completedAt  DateTime? @map("completed_at")
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  audio      Audio?      @relation(fields: [audioId], references: [id], onDelete: SetNull)
+  transcript Transcript? @relation(fields: [transcriptId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+  @@map("jobs")
+}
+
+model Usage {
+  id                  String   @id @default(uuid())
+  userId              String   @unique @map("user_id")
+  transcriptionMinutes Int     @default(0) @map("transcription_minutes")
+  aiRequests          Int     @default(0) @map("ai_requests")
+  storageBytes        BigInt  @default(0) @map("storage_bytes")
+  periodStart         DateTime @default(now()) @map("period_start")
+  periodEnd           DateTime @map("period_end")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([periodStart])
+  @@map("usage")
 }
